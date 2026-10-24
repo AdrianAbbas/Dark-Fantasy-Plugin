@@ -2,6 +2,7 @@ name: Native build
 on: [push, pull_request, workflow_dispatch]
 jobs:
   macos:
+    if: github.ref != 'refs/heads/ci/au-diagnostics'
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
@@ -19,6 +20,7 @@ jobs:
           name: VEIL-macOS-arm64-unsigned
           path: build/VEIL_artefacts/Release/
   linux:
+    if: github.ref != 'refs/heads/ci/au-diagnostics'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4

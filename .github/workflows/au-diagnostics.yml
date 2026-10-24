@@ -16,10 +16,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p diagnostics
-          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/jobs/120759313834/logs > diagnostics/macos-original-job.log
-          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40056101232 > diagnostics/original-run.json
-          test -s diagnostics/macos-original-job.log
+          set +e
+          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/jobs/120759313834/logs > diagnostics/macos-original-job.log 2> diagnostics/job-logs-error.txt
+          echo "job_logs_exit=$?" > diagnostics/retrieval-status.txt
+          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40056101232 > diagnostics/original-run.json 2> diagnostics/run-info-error.txt
+          echo "run_info_exit=$?" >> diagnostics/retrieval-status.txt
+          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40056101232/logs > diagnostics/original-run-logs.zip 2> diagnostics/run-logs-error.txt
+          echo "run_logs_exit=$?" >> diagnostics/retrieval-status.txt
       - name: Preserve logs on diagnostic branch for retrieval
+        if: always()
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
