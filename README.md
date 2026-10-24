@@ -25,13 +25,15 @@ Outputs are under `build-mac/VEIL_artefacts/Release/`:
 - `VST3/VEIL.vst3`
 - `Standalone/VEIL.app`
 
-Install the AU into your user plugin folder:
+Install, register and validate the Apple Silicon AU:
 
 ```sh
-mkdir -p "$HOME/Library/Audio/Plug-Ins/Components"
-cp -R build-mac/VEIL_artefacts/Release/AU/VEIL.component "$HOME/Library/Audio/Plug-Ins/Components/"
-auval -v aufx Vel1 Veil
+bash scripts/validate-au-macos.sh build-mac/VEIL_artefacts/Release/AU/VEIL.component build-mac/au-validation
 ```
+
+The script checks the arm64 architecture and exact AU identifiers (`aufx` / `Vel1` / `Veil`), ad-hoc-signs the complete bundle, installs it with `ditto`, refreshes the current user's AudioComponentRegistrar and waits for discovery before running Apple's `auval`. Registration failures and actual validation failures remain errors; logs are saved in the selected validation directory. The script is specifically for arm64 validation. An Intel build needs the equivalent x86_64 `auval` invocation.
+
+GitHub Actions uploads **VEIL-macOS-arm64-unsigned** even when validation fails. It contains `VEIL-macOS-arm64-AU.zip`; extract that inner ZIP to preserve the component's executable permissions and bundle structure. Install `VEIL.component` in `~/Library/Audio/Plug-Ins/Components/`. The accompanying **VEIL-macOS-AU-diagnostics** artifact contains the discovery, signature and complete `auval` output. A downloadable artifact does not by itself establish that validation passed; check the macOS job result.
 
 Quit Logic before installing. Launch Logic, open **Logic Pro > Settings > Plug-in Manager**, find **Veil Audio / VEIL**, and use **Reset & Rescan Selection** if needed. Insert VEIL in an **Audio FX** slot after the instrument on a software instrument channel strip, or on an audio track. It is not an instrument and requires incoming audio. Verify automation, mono/stereo instances, bypass and session reopening in Logic. Developer-local builds are not notarized distribution releases; commercial delivery needs your own Apple signing identity, hardened-runtime packaging where applicable, notarization and installer testing.
 
