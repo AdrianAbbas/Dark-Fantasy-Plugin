@@ -46,7 +46,8 @@ juce_add_plugin(VEIL
 target_sources(VEIL PRIVATE
     Source/PluginProcessor.cpp Source/PluginEditor.cpp
     Source/RitualEngine.cpp Source/PresetManager.cpp
-    Source/DSP/BasicModules.cpp Source/DSP/SpatialModules.cpp
+    Source/DSP/Abyss.cpp Source/DSP/AncientBlood.cpp Source/DSP/Choir.cpp
+    Source/DSP/Wraith.cpp Source/DSP/Echoes.cpp Source/DSP/Crypt.cpp
     Source/UI/VeilLookAndFeel.cpp Source/UI/ParameterControls.cpp Source/UI/RitualSigil.cpp)
 target_include_directories(VEIL PUBLIC Source)
 target_compile_definitions(VEIL PUBLIC
@@ -61,8 +62,8 @@ if(VEIL_BUILD_TESTS)
     get_target_property(veil_test_definitions VeilTests COMPILE_DEFINITIONS)
     list(REMOVE_ITEM veil_test_definitions JUCE_STANDALONE_APPLICATION=1)
     set_target_properties(VeilTests PROPERTIES COMPILE_DEFINITIONS "${veil_test_definitions}")
-    target_sources(VeilTests PRIVATE Tests/VeilTests.cpp)
+    target_sources(VeilTests PRIVATE Tests/VeilTests.cpp Tests/Demos.cpp)
     target_link_libraries(VeilTests PRIVATE VEIL juce::juce_audio_utils juce::juce_dsp)
     target_compile_definitions(VeilTests PRIVATE JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
-    add_test(NAME veil_regression COMMAND VeilTests)
+    add_test(NAME veil_regression COMMAND VeilTests --gating)
 endif()

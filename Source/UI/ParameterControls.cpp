@@ -77,13 +77,15 @@ void ModulePanel::resized(){
     const int top=52,bottom=7;
     std::vector<ParameterControl*> dials,compact;
     for(auto& c:controls)(c->isCompact()?compact:dials).push_back(c.get());
+    // Panels with many dials use three columns so every dial stays readable.
+    const int columns=dials.size()>6 ? 3 : 2;
     const int compactRows=(int(compact.size())+1)/2;
-    const int dialRows=(int(dials.size())+1)/2;
+    const int dialRows=(int(dials.size())+columns-1)/columns;
     const int available=getHeight()-top-bottom;
     const int ch=juce::jmin(45,available/juce::jmax(1,dialRows+compactRows));
     const int dh=juce::jmin(128,(available-ch*compactRows)/juce::jmax(1,dialRows));
-    const int cw=(getWidth()-20)/2;
-    for(std::size_t i=0;i<dials.size();++i)dials[i]->setBounds(10+int(i%2)*cw,top+int(i/2)*dh,cw,dh);
+    const int cw=(getWidth()-20)/2, dw=(getWidth()-20)/columns;
+    for(std::size_t i=0;i<dials.size();++i)dials[i]->setBounds(10+int(i%std::size_t(columns))*dw,top+int(i/std::size_t(columns))*dh,dw,dh);
     const auto ct=top+dh*dialRows;
     for(std::size_t i=0;i<compact.size();++i){const bool lastWide=(i==compact.size()-1 && compact.size()%2==1);compact[i]->setBounds(10+int(i%2)*cw,ct+int(i/2)*ch,lastWide?cw*2:cw,ch);}
 }

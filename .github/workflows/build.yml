@@ -29,7 +29,7 @@ jobs:
       - name: Processor tests (arm64)
         run: ctest --test-dir build --output-on-failure
       - name: Processor tests (x86_64 under Rosetta)
-        run: /usr/bin/arch -x86_64 build/VeilTests_artefacts/Release/VeilTests
+        run: /usr/bin/arch -x86_64 build/VeilTests_artefacts/Release/VeilTests --gating
       - name: Universal binary and Info.plist gate
         run: bash scripts/ci-check-bundles.sh build/VEIL_artefacts/Release
       - name: Developer ID signing and notarisation (optional, untested)
@@ -83,6 +83,9 @@ jobs:
       - run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
       - run: cmake --build build --parallel 3
       - run: ctest --test-dir build --output-on-failure
+      - name: Milestone 2 sound targets (still being tuned; reported, not gating)
+        continue-on-error: true
+        run: build/VeilTests_artefacts/Release/VeilTests --sound-targets
   release:
     # Tagged commits (v*) publish the same package as a GitHub Release.
     if: startsWith(github.ref, 'refs/tags/v')

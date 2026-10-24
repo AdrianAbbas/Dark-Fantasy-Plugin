@@ -9,15 +9,18 @@ VeilAudioProcessorEditor::VeilAudioProcessorEditor(VeilAudioProcessor& p)
     setOpaque(true);
     addAndMakeVisible(sigil);
     auto& state=p.parameters;
-    modules[0]=std::make_unique<ModulePanel>(state,"I   THE ABYSS","DARK FILTERING",AbyssOn,std::initializer_list<P>{Cutoff,Resonance,HighPass,Darkness,FilterMovement,FilterRate,Slope,FilterSync});
-    modules[1]=std::make_unique<ModulePanel>(state,"II   THE CRYPT","CATHEDRAL REVERB",CryptOn,std::initializer_list<P>{Space,Decay,PreDelay,Damping,ReverbLowCut,Shimmer,ReverbWidth,ReverbMix,Character});
-    modules[2]=std::make_unique<ModulePanel>(state,"III   THE WRAITH","SPECTRAL HAUNTING",WraithOn,std::initializer_list<P>{Blur,WraithDetune,Drift,Ghost,WraithMix,Freeze});
-    modules[3]=std::make_unique<ModulePanel>(state,"IV   ANCIENT BLOOD","SATURATION & DECAY",BloodOn,std::initializer_list<P>{Drive,Texture,Age,Dust,Instability,BloodMix});
-    modules[4]=std::make_unique<ModulePanel>(state,"V   THE ECHOES","MYSTICAL DELAY",EchoesOn,std::initializer_list<P>{DelayTime,Feedback,DelayDamping,Diffusion,Spread,DelayMix,DelaySync,Reverse});
-    modules[5]=std::make_unique<ModulePanel>(state,"VI   THE CHOIR","PHANTOM HARMONICS",ChoirOn,std::initializer_list<P>{Voices,ChoirDetune,Formant,ChoirMovement,ChoirBlend,Interval});
+    // Left column then right column follows the signal: Abyss, Blood, Choir | Wraith, Echoes, Crypt.
+    modules[0]=std::make_unique<ModulePanel>(state,"I   THE ABYSS","DARK FILTERING  /  TOMB RESONATOR",AbyssOn,std::initializer_list<P>{Cutoff,Resonance,HighPass,Darkness,FilterMovement,FilterRate,Tomb,TombRing,Slope,FilterSync,TombNote,TombOctave});
+    modules[1]=std::make_unique<ModulePanel>(state,"IV   ANCIENT BLOOD","SATURATION & DECAY",BloodOn,std::initializer_list<P>{Drive,Texture,Age,Dust,Instability,BloodMix});
+    modules[2]=std::make_unique<ModulePanel>(state,"VI   THE CHOIR","PHANTOM HARMONICS  /  DRONE",ChoirOn,std::initializer_list<P>{Voices,ChoirDetune,Formant,ChoirMovement,ChoirBlend,Drone,DroneHold,Interval});
+    modules[3]=std::make_unique<ModulePanel>(state,"III   THE WRAITH","SPECTRAL HAUNTING",WraithOn,std::initializer_list<P>{Blur,WraithDetune,Drift,Ghost,WraithMix,Freeze});
+    modules[4]=std::make_unique<ModulePanel>(state,"V   THE ECHOES","MYSTICAL DELAY  /  DESCENT",EchoesOn,std::initializer_list<P>{DelayTime,Feedback,DelayDamping,Diffusion,Spread,DelayMix,DelaySync,Descent,Reverse});
+    modules[5]=std::make_unique<ModulePanel>(state,"II   THE CRYPT","CATHEDRAL REVERB  /  RISING  /  ETERNAL",CryptOn,std::initializer_list<P>{Space,Decay,PreDelay,Damping,ReverbLowCut,Shimmer,ReverbWidth,ReverbMix,RiseTime,Character,CryptMode,Eternal});
     for(int i=0;i<6;++i){addAndMakeVisible(*modules[std::size_t(i)]);modules[std::size_t(i)]->onSelect=[this,i]{selectModule(i/3,i%3);};}
     const std::array<P,3> globalIds{{InputGain,GlobalMix,OutputGain}};
     for(std::size_t i=0;i<globals.size();++i){globals[i]=std::make_unique<ParameterControl>(state,globalIds[i]);addAndMakeVisible(*globals[i]);}
+    dread=std::make_unique<ParameterControl>(state,Dread);addAndMakeVisible(*dread);
+    autoLevel=std::make_unique<ParameterControl>(state,AutoLevel);addAndMakeVisible(*autoLevel);
     const std::array<P,4> motionIds{{MotionRate,MotionDepth,MotionPattern,MotionSync}};
     for(std::size_t i=0;i<motion.size();++i){motion[i]=std::make_unique<ParameterControl>(state,motionIds[i]);addAndMakeVisible(*motion[i]);}
     for(int i=0;i<p.factoryPresetCount();++i)presets.addItem(p.factoryPresetName(i),i+1);
@@ -69,6 +72,8 @@ void VeilAudioProcessorEditor::resized(){
     bottom={28,h-116,w-56,96};
     const int globalWidth=94;
     for(int i=0;i<3;++i)globals[std::size_t(i)]->setBounds(w/2-globalWidth*3/2+i*globalWidth,bottom.getY()-1,globalWidth,94);
+    dread->setBounds(w/2+165,10,104,104);
+    autoLevel->setBounds(w/2+globalWidth*3/2+12,bottom.getY()+30,120,30);
 }
 void VeilAudioProcessorEditor::drawMeter(juce::Graphics& g,juce::Rectangle<float> b,float level,const juce::String& label){
     g.setColour(muted);g.setFont(juce::FontOptions(10.f));g.drawText(label,b.removeFromTop(18),juce::Justification::centredLeft);
@@ -130,7 +135,7 @@ void VeilAudioProcessorEditor::showSettings(){
     juce::Component::SafePointer<VeilAudioProcessorEditor> safe(this);
     menu.showMenuAsync(juce::PopupMenu::Options().withTargetComponent(settings),[safe](int result){if(!safe||result==0)return;juce::String message;
         if(result==1)message="Select a module header to reveal its controls. Drag a dial; double-click to reset, or type a value below it.\n\nThe sigil morphs between Shadow, Spirit and Ruin. Bronze dots mark parameters affected by the Ritual. Your manual settings remain the starting point. Disable Ritual to hear them directly.\n\nSTORE A/B captures comparison slots; A/B recalls them. SAVE and LOAD use .veilpreset files. Host automation is available for every parameter.";
-        if(result==2)message="Abyss -> Ancient Blood -> Echoes -> Crypt -> Wraith -> Choir.\n\nDry audio passes without algorithmic delay (reported latency: 0 samples). Granular, pitch-shifted, reverse and reverb layers have intentional internal delays. Use Global Wet / Dry to blend the complete chain.\n\nFree time controls apply when their sync menu is set to Free. Host synchronization falls back to 120 BPM when no tempo is supplied.";
+        if(result==2)message="Abyss -> Ancient Blood -> Choir -> Wraith -> Echoes -> Crypt.\n\nThe only reported latency is Ancient Blood's oversampling (a few milliseconds); the dry path is delayed to match. Spectral, granular, reverse and reverb layers have intentional internal delays.\n\nDREAD at 50 % plays your settings exactly. Auto Level keeps the processed level close to the input and holds during tails. Host tempo falls back to 120 BPM when none is supplied.";
         if(result==3)message="VEIL\nDark Fantasy Processor\n\nAn original six-module audio effect with a two-dimensional Ritual Engine. All interface artwork is drawn procedurally.\n\nBuilt with JUCE. See the project README and dependency notices for licensing and known limitations.";
         juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon,result==1?"VEIL | Control guide":result==2?"VEIL | Signal path":"About VEIL",message);
     });

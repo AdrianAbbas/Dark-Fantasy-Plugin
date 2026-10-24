@@ -11,7 +11,9 @@ class RitualEngine {
 public:
     void prepare(double sampleRate);
     void reset();
-    Frame process(const Frame& manual, float bpm) noexcept;
+    Frame process(const Frame& manual, float bpm) noexcept { return processBlock(manual, bpm, 1); }
+    // Advances the motion by `samples` at once (called once per processing block).
+    Frame processBlock(const Frame& manual, float bpm, int samples) noexcept;
     float x() const noexcept { return static_cast<float>(displayX); }
     float y() const noexcept { return static_cast<float>(displayY); }
     static RitualWeights weights(float x, float y) noexcept;

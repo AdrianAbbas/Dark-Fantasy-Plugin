@@ -243,3 +243,26 @@ The chain, from the report's system log:
 | B6 | AU editor and out-of-process hosting never exercised by any test | confirmed | E4 | harness added; enforced in Milestone 1 |
 | B7 | GarageBand silence and generic UI: Gatekeeper rejects the quarantined ad-hoc-signed bundle, so `AUHostingServiceXPC_arrow` cannot load it and GarageBand's `OpenAsync` returns −1 | **confirmed** on the user's Mac | "Root cause" above | Milestone 1: install script + quarantined-install CI test |
 | B8 | CI signed only the AU; the Standalone `VEIL.app` in the artifact kept a linker-only signature and was blocked on the user's Mac | confirmed on the user's Mac | user report | Milestone 1: sign every bundle; Standalone no longer shipped |
+
+## Milestone 1 gate
+Confirmed by the user in GarageBand: sound passes and the custom interface appears.
+
+## Milestone 2 — handoff (work paused at the user's request, usage limit)
+
+**Done (committed):**
+- All six modules rewritten (`Source/DSP/`): Abyss with Tomb Resonator (note-tuned stone comb), Ancient Blood (2x oversampled drive, wow, age, dust), Choir with sub-octave Drone, Wraith (STFT blur/detune/drift, octave Ghost, Freeze), Echoes with Descent (semitone/fifth/octave per repeat), Crypt (8-line FDN, four chambers) with Rising (reverse swell) and Eternal (hold).
+- Wet/Dry defaults to 100 %; module mixes retuned; DREAD macro (`Source/Dread.h`, 50 % = exact no-op) with a large knob in the top bar.
+- Gain staging: auto level match (wet to dry, -18..+12 dB, holds during tails) plus a sample-peak safety limiter at -0.3 dBFS.
+- Latency: Blood reports ~2.6 ms (124 samples at 48 kHz); the dry path is delayed to match. The AU harness now compares bypass and Wet/Dry 0 against the latency-delayed input.
+- 16 rebuilt factory presets.
+- Fixes found while tuning: Crypt Eternal was draining (shimmer and delay modulation in the loop ate ~5 dB/s; both now fade out under Eternal, lengths are whole samples); Echoes diffusion was a lerp that comb-filtered and lost ~9 dB per stage, now true all-passes with their delay taken out of the tap; Wraith Ghost range raised (up to 1.9x source); a test-signal buffer overrun in `pianoPhrase`.
+- Test suite rewritten (`Tests/VeilTests.cpp`, `Tests/TestSignals.h`). CI gates on the correctness groups (`--gating`: state, transparency, stability incl. zero allocations and fuzz, ritual, editor): all pass on Linux.
+- `Tests/Demos.cpp` (`--render-demos <dir>`, `--probe ...`) is written and compiles but is not run in CI.
+
+**Skipped / not finished:**
+- Demo WAVs and the `VEIL-audio-demos` CI artifact: skipped.
+- Sound targets (`--sound-targets`) still FAIL; CI runs them as a reported, non-gating Linux step. Last local run before the fixes above: Abyss centroid ratio 0.59 (target < 0.45), defaults centroid ratio 0.53 (< 0.5), Blood harmonics -20.7 dB (> -20), Wraith ghost -18 dB (> -16), Echoes first repeat -26 dB (> -14), Crypt T60 2.6 s (> 4), Eternal -43 dB over 9 s (> -6), DREAD 0→100 darkness, 8 of 24 heavy random settings 4-5 dB low and one -30 dB, ranges: Movement Sync and Drone Hold. Not re-run after the fixes.
+- Planned measurement corrections (not written): magnitude-weighted centroid plus a >2 kHz energy check; Echoes test with a short saw burst instead of an impulse (the echo damping removes most of an impulse's energy); Crypt T60 in the 1 kHz band instead of white noise; gain test at a realistic input level.
+- Planned DSP changes (not written): DREAD should also raise Crypt and Echo damping; clamp Abyss high-pass below the low-pass so random settings cannot close the band.
+- README / MANUAL_TEST updates for M2 features.
+- Not verified on macOS: the M2 build, harness latency change and GarageBand behaviour. Milestone 3 (Haunting) waits for the user's sound approval.

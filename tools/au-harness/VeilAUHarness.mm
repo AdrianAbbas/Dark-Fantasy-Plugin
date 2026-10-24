@@ -246,10 +246,10 @@ struct RenderResult {
 };
 
 // Accumulates statistics for output written into `channels`, comparing channel 0 to
-// the source's captured input at the same sample index.
+// the source's captured input `latency` samples earlier (the plug-in's reported latency).
 struct Meter {
     double sum[2] {}, inSum = 0, diffSum = 0;
-    size_t counted = 0;
+    size_t counted = 0, latency = 0;
     float peak = 0;
     bool finite = true;
 
@@ -263,7 +263,7 @@ struct Meter {
                 if (index >= skip && c < 2) sum[c] += double(v) * v;
             }
             if (index >= skip) {
-                const float in = index < source.capturedCount ? source.captured[index] : 0.0f;
+                const float in = index >= latency && index - latency < source.capturedCount ? source.captured[index - latency] : 0.0f;
                 const float out = std::isfinite(channels[0][n]) ? channels[0][n] : 0.0f;
                 inSum += double(in) * in;
                 diffSum += double(out - in) * (out - in);
@@ -293,6 +293,7 @@ struct V2Host {
     Pacer pacer;
     Source source;
     double sampleRate = 48000.0;
+    size_t latencySamples = 0;   // kAudioUnitProperty_Latency, read after initialisation
     UInt32 inChannels = 2, outChannels = 2, maxFrames = 512;
     Float64 sampleTime = 0;
     std::vector<std::vector<float>> outputs;
@@ -328,6 +329,12 @@ struct V2Host {
         outputs.assign(out, std::vector<float>(maxFrames, 0.0f));
         trace("initialize");
         s = AudioUnitInitialize(unit);
+        if (s == noErr) {
+            Float64 latency = 0;
+            UInt32 size = sizeof(latency);
+            if (AudioUnitGetProperty(unit, kAudioUnitProperty_Latency, kAudioUnitScope_Global, 0, &latency, &size) == noErr && latency >= 0 && latency < 1)
+                latencySamples = size_t(std::llround(latency * sampleRate));
+        }
         trace("done");
         return s;
     }
@@ -340,6 +347,7 @@ struct V2Host {
         auto* abl = reinterpret_cast<AudioBufferList*>(storage.data());
         std::vector<const float*> channels(outChannels);
         Meter meter;
+        meter.latency = latencySamples;
         size_t done = 0;
         rendered = true;
         pacer.begin();
@@ -830,6 +838,7 @@ void auAudioUnitSuite(Report& r, AudioComponentDescription description, bool use
         const auto total = size_t(seconds * 48000.0), skip = size_t(skipSeconds * 48000.0);
         source.reset(total);
         Meter meter;
+        if (unit.latency >= 0 && unit.latency < 1) meter.latency = size_t(std::llround(unit.latency * 48000.0));
         std::vector<uint8_t> storage(offsetof(AudioBufferList, mBuffers) + sizeof(AudioBuffer) * 2);
         auto* abl = reinterpret_cast<AudioBufferList*>(storage.data());
         size_t doneFrames = 0;

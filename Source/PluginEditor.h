@@ -23,6 +23,7 @@ private:
     std::array<std::unique_ptr<veil::ui::ModulePanel>,6> modules;
     std::array<int,2> selected{{0,1}};
     std::array<std::unique_ptr<veil::ui::ParameterControl>,3> globals;
+    std::unique_ptr<veil::ui::ParameterControl> dread, autoLevel;
     std::array<std::unique_ptr<veil::ui::ParameterControl>,4> motion;
     juce::ComboBox presets;
     juce::TextButton previous{"<"},next{">"},save{"SAVE"},load{"LOAD"},settings{"SETTINGS"};

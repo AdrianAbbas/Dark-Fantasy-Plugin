@@ -4,31 +4,71 @@
 
 namespace veil {
 namespace {
-FactoryPreset make(const char* name, std::initializer_list<std::pair<P, float>> changes) {
+// Every preset starts from the complete default frame, so every parameter is set.
+FactoryPreset make(const char* name, const char* description, std::initializer_list<std::pair<P, float>> changes) {
     auto values = defaults();
-    // All programs initialize every parameter, including hidden choices and motion.
-    values[Freeze] = 0.0f;
+    values[RitualOn] = 0; values[Freeze] = 0; values[Eternal] = 0; values[Bypass] = 0;
     for (const auto& [parameter, value] : changes) values[parameter] = value;
-    return {name, values};
+    return { name, description, values };
 }
 }
-const std::array<FactoryPreset, 15>& factoryPresets() {
-    static const std::array<FactoryPreset, 15> bank {{
-        make("Forgotten Kingdom", {{Cutoff,4200},{Darkness,.42f},{Space,.72f},{Decay,7.0f},{Character,1},{ReverbMix,.36f},{DelayTime,610},{Feedback,.36f},{ChoirBlend,.14f},{RitualX,.30f},{RitualY,.73f},{MotionOn,1},{MotionRate,.025f},{MotionDepth,.24f}}),
-        make("Cathedral at Midnight", {{Cutoff,3600},{Darkness,.48f},{Space,.97f},{Decay,14.5f},{PreDelay,72},{Damping,.78f},{ReverbLowCut,240},{ReverbMix,.62f},{Character,1},{WraithMix,.10f},{BloodMix,.12f},{DelayMix,.09f},{ChoirBlend,.06f},{RitualX,.22f},{RitualY,.88f},{GlobalMix,.80f}}),
-        make("The Hollow Choir", {{Cutoff,9600},{Darkness,.10f},{Space,.66f},{Decay,6.8f},{Damping,.42f},{ReverbMix,.29f},{Blur,.46f},{Ghost,.54f},{WraithMix,.38f},{Drive,1},{BloodMix,.08f},{DelayMix,.10f},{Voices,4},{Interval,2},{ChoirDetune,12},{Formant,.72f},{ChoirBlend,.62f},{RitualX,.50f},{RitualY,.10f},{GlobalMix,.76f}}),
-        make("Abyssal Drone", {{Cutoff,1250},{HighPass,26},{Darkness,.72f},{FilterMovement,.55f},{FilterRate,.035f},{Space,.88f},{Decay,16},{Character,3},{PreDelay,100},{ReverbMix,.50f},{Blur,.68f},{Ghost,.48f},{WraithMix,.37f},{Interval,0},{ChoirBlend,.26f},{DelayTime,1200},{Feedback,.64f},{DelayMix,.25f},{RitualX,.15f},{RitualY,.85f},{MotionOn,1},{MotionPattern,2},{MotionRate,.013f},{MotionDepth,.58f},{GlobalMix,.84f}}),
-        make("Cursed Forest", {{Cutoff,5600},{FilterMovement,.52f},{FilterRate,.21f},{Space,.51f},{Decay,4.2f},{Character,2},{Blur,.34f},{WraithDetune,18},{Drift,.72f},{Ghost,.40f},{WraithMix,.29f},{Drive,6},{Texture,.38f},{Age,.32f},{Instability,.65f},{BloodMix,.48f},{DelayTime,370},{Reverse,1},{Diffusion,.53f},{DelayMix,.26f},{RitualX,.74f},{RitualY,.79f},{MotionOn,1},{MotionPattern,2},{MotionRate,.067f},{MotionDepth,.42f}}),
-        make("Fallen Angel", {{Cutoff,11000},{Darkness,.08f},{Space,.84f},{Decay,10},{Damping,.30f},{Shimmer,.58f},{ReverbMix,.49f},{Character,3},{Blur,.48f},{Ghost,.49f},{WraithMix,.28f},{BloodMix,.10f},{DelaySync,3},{DelayMix,.18f},{Interval,3},{Voices,3},{Formant,.62f},{ChoirBlend,.36f},{RitualX,.50f},{RitualY,.02f},{GlobalMix,.80f}}),
-        make("Ashes of a King", {{Cutoff,3200},{Darkness,.52f},{Space,.58f},{Decay,5.9f},{Damping,.84f},{ReverbMix,.35f},{Character,0},{WraithMix,.12f},{Drive,9},{Texture,.46f},{Age,.72f},{Dust,.09f},{Instability,.36f},{BloodMix,.63f},{DelayTime,680},{DelayDamping,.86f},{DelayMix,.19f},{ChoirBlend,.07f},{RitualX,.83f},{RitualY,.90f}}),
-        make("Moonlit Ruins", {{Cutoff,8500},{Darkness,.16f},{Space,.42f},{Decay,3.6f},{PreDelay,28},{Damping,.47f},{ReverbMix,.24f},{Character,0},{Blur,.20f},{Ghost,.19f},{WraithMix,.12f},{Drive,1},{Age,.05f},{BloodMix,.15f},{DelaySync,1},{Feedback,.30f},{DelayMix,.24f},{Interval,2},{Voices,2},{ChoirBlend,.12f},{RitualX,.42f},{RitualY,.42f},{GlobalMix,.52f}}),
-        make("The Black Citadel", {{Cutoff,1050},{HighPass,28},{Resonance,.53f},{Darkness,.82f},{Space,.94f},{Decay,11},{PreDelay,95},{Damping,.91f},{ReverbLowCut,80},{Character,2},{ReverbMix,.53f},{WraithMix,.15f},{Drive,7},{Texture,.28f},{BloodMix,.40f},{DelayTime,950},{Feedback,.48f},{DelayDamping,.89f},{DelayMix,.25f},{Interval,0},{ChoirBlend,.28f},{RitualX,.03f},{RitualY,.98f},{GlobalMix,.83f}}),
-        make("Ghosts of the Chapel", {{Cutoff,6500},{Space,.68f},{Decay,6.4f},{Character,0},{ReverbMix,.36f},{Blur,.62f},{WraithDetune,14},{Drift,.66f},{Ghost,.77f},{WraithMix,.55f},{BloodMix,.10f},{DelayTime,820},{Feedback,.61f},{Diffusion,.72f},{Reverse,1},{DelayMix,.37f},{Voices,4},{ChoirBlend,.22f},{RitualX,.48f},{RitualY,.14f},{GlobalMix,.77f}}),
-        make("Witch's Lament", {{Cutoff,5800},{Resonance,.43f},{FilterMovement,.38f},{FilterRate,.40f},{Space,.60f},{Decay,5.3f},{Character,2},{ReverbMix,.31f},{WraithDetune,22},{Drift,.60f},{Ghost,.43f},{WraithMix,.29f},{Drive,5},{Instability,.34f},{BloodMix,.25f},{DelaySync,3},{Feedback,.45f},{DelayMix,.32f},{Interval,1},{Voices,2},{Formant,.83f},{ChoirBlend,.39f},{RitualX,.62f},{RitualY,.40f}}),
-        make("Eternal Winter", {{Cutoff,14000},{Darkness,.04f},{HighPass,140},{Space,.90f},{Decay,12},{Damping,.19f},{Shimmer,.36f},{ReverbMix,.47f},{Character,3},{Blur,.76f},{WraithDetune,9},{Drift,.42f},{Ghost,.55f},{WraithMix,.42f},{BloodMix,.06f},{DelayTime,1090},{DelayDamping,.25f},{Diffusion,.65f},{DelayMix,.20f},{Interval,3},{ChoirDetune,17},{Formant,.22f},{ChoirBlend,.27f},{RitualX,.50f},{RitualY,.02f},{MotionOn,1},{MotionRate,.02f},{MotionDepth,.30f},{GlobalMix,.83f}}),
-        make("The Final Ritual", {{Cutoff,5000},{Darkness,.35f},{Space,.88f},{Decay,9.0f},{Character,3},{ReverbMix,.46f},{Shimmer,.24f},{Blur,.56f},{Ghost,.65f},{WraithMix,.40f},{Drive,11},{Texture,.53f},{Age,.44f},{Instability,.52f},{BloodMix,.44f},{DelaySync,4},{Feedback,.66f},{Diffusion,.74f},{Reverse,1},{DelayMix,.36f},{Voices,4},{ChoirBlend,.36f},{RitualX,.5f},{RitualY,.63f},{MotionOn,1},{MotionPattern,0},{MotionRate,.055f},{MotionDepth,.95f},{GlobalMix,.88f},{OutputGain,-6}}),
-        make("Ancient Spellbook", {{Cutoff,4600},{Darkness,.40f},{Space,.31f},{Decay,2.7f},{Character,2},{ReverbMix,.21f},{WraithMix,.08f},{Drive,8},{Texture,.58f},{Age,.82f},{Dust,.16f},{Instability,.46f},{BloodMix,.74f},{DelayTime,245},{DelayDamping,.83f},{Diffusion,.18f},{DelayMix,.25f},{ChoirBlend,.04f},{RitualX,.95f},{RitualY,.98f},{GlobalMix,.70f}}),
-        make("Throne of Shadows", {{Cutoff,2450},{Resonance,.36f},{Darkness,.64f},{FilterMovement,.26f},{Space,.89f},{Decay,9.5f},{PreDelay,56},{Damping,.72f},{Character,1},{ReverbMix,.45f},{Blur,.36f},{Ghost,.32f},{WraithMix,.25f},{Drive,5},{Age,.24f},{BloodMix,.35f},{DelayTime,740},{Feedback,.49f},{Diffusion,.52f},{DelayMix,.25f},{Interval,0},{Voices,4},{Formant,.35f},{ChoirBlend,.27f},{RitualX,.16f},{RitualY,.87f},{MotionOn,1},{MotionPattern,1},{MotionRate,.024f},{MotionDepth,.30f},{GlobalMix,.80f}})
+const std::array<FactoryPreset, factoryPresetTotal>& factoryPresets() {
+    static const std::array<FactoryPreset, factoryPresetTotal> bank {{
+        make("Init - Clean Altar", "Near-transparent starting point: every module off.",
+             {{AbyssOn,0},{BloodOn,0},{ChoirOn,0},{WraithOn,0},{EchoesOn,0},{CryptOn,0},{Dread,.5f},{GlobalMix,1}}),
+        make("Forgotten Kingdom", "A vast, distant hall; sparse dotted echoes and a faint monk choir.",
+             {{Cutoff,1900},{Darkness,.5f},{Space,.85f},{Decay,11},{PreDelay,60},{Character,1},{ReverbMix,.6f},
+              {DelaySync,5},{Feedback,.45f},{DelayMix,.3f},{Diffusion,.6f},{ChoirBlend,.3f},{Drone,.25f},{Interval,0},
+              {WraithMix,.4f},{Blur,.65f},{Drive,8},{BloodMix,.4f}}),
+        make("Cathedral at Midnight", "Sixteen-second cathedral, shimmering high choir, very dark stone.",
+             {{Cutoff,2600},{Darkness,.65f},{Space,1},{Decay,16},{PreDelay,90},{Damping,.7f},{Shimmer,.3f},{Character,1},
+              {ReverbMix,.75f},{Interval,4},{Formant,.95f},{ChoirBlend,.4f},{Voices,4},{DelayMix,.15f},{WraithMix,.3f},{BloodMix,.3f}}),
+        make("The Hollow Choir", "Four phantom voices an octave below and a held drone that never quite leaves.",
+             {{Cutoff,3200},{Darkness,.4f},{Voices,4},{Interval,0},{ChoirDetune,22},{Formant,.75f},{ChoirMovement,.6f},{ChoirBlend,.85f},
+              {Drone,.7f},{DroneHold,14},{Ghost,.6f},{WraithMix,.45f},{Character,0},{Decay,5},{ReverbMix,.45f},{DelayMix,.2f}}),
+        make("Abyssal Drone", "Sub-octave drone, frozen-smeared spectra and an endless void tuned to D.",
+             {{Cutoff,650},{Darkness,.85f},{Resonance,.45f},{Tomb,.55f},{TombNote,2},{TombOctave,1},{TombRing,.85f},
+              {Drone,.9f},{DroneHold,25},{ChoirBlend,.5f},{Interval,0},{Blur,.92f},{WraithMix,.65f},{Ghost,.3f},
+              {Character,3},{Decay,24},{ReverbMix,.7f},{Descent,3},{Feedback,.6f},{DelayMix,.3f},{Drive,10}}),
+        make("Cursed Forest", "Wobbling, worn tape; reversed echoes creep through a twisted crypt.",
+             {{Cutoff,3600},{FilterMovement,.7f},{FilterRate,.3f},{Resonance,.5f},{Drive,18},{Texture,.55f},{Age,.55f},{Dust,.3f},
+              {Instability,.75f},{BloodMix,.85f},{Reverse,1},{Diffusion,.8f},{Spread,1},{Feedback,.55f},{DelayMix,.5f},
+              {WraithDetune,45},{Drift,.8f},{WraithMix,.45f},{Character,2},{Decay,4},{ReverbMix,.45f},{ChoirBlend,.2f}}),
+        make("Fallen Angel", "Bright, shimmering heaven collapsing slowly: octave-up choir and ghosts in an endless void.",
+             {{Cutoff,9000},{Darkness,.15f},{Shimmer,.75f},{Character,3},{Decay,14},{Damping,.25f},{ReverbMix,.7f},
+              {Interval,4},{Formant,.9f},{ChoirBlend,.55f},{Voices,3},{Ghost,.8f},{WraithMix,.55f},{Blur,.6f},
+              {DelayMix,.25f},{Drive,4},{BloodMix,.3f}}),
+        make("Ashes of a King", "Burnt, ancient saturation and dust; echoes that sink a semitone at a time.",
+             {{Drive,26},{Texture,.65f},{Age,.85f},{Dust,.45f},{Instability,.4f},{BloodMix,.9f},{Cutoff,1500},{Darkness,.6f},
+              {DelaySync,2},{Descent,1},{Feedback,.55f},{DelayMix,.4f},{Character,0},{Decay,3},{ReverbMix,.35f},
+              {ChoirBlend,.15f},{WraithMix,.25f}}),
+        make("Moonlit Ruins", "Open and silvery: wide ping-pong echoes and a short chapel; the lightest world.",
+             {{Cutoff,6000},{Darkness,.2f},{FilterMovement,.35f},{DelaySync,3},{Feedback,.6f},{Spread,1},{DelayMix,.5f},{Diffusion,.3f},
+              {Character,0},{Decay,5},{ReverbMix,.45f},{Blur,.3f},{WraithMix,.3f},{ChoirBlend,.2f},{Drive,5},{BloodMix,.35f},{Dread,.4f}}),
+        make("The Black Citadel", "A low, resonant fortress: tomb resonance in A, a fifth-dropping echo, heavy stone.",
+             {{Cutoff,480},{Resonance,.55f},{Darkness,.9f},{Tomb,.45f},{TombNote,9},{TombOctave,0},{TombRing,.7f},
+              {Drive,20},{BloodMix,.75f},{Character,2},{Decay,9},{ReverbMix,.65f},{Descent,2},{DelaySync,4},{Feedback,.55f},{DelayMix,.35f},
+              {Interval,0},{ChoirBlend,.4f},{Drone,.5f}}),
+        make("Ghosts of the Chapel", "Pale octave ghosts and backwards echoes drift through a small stone chapel.",
+             {{Ghost,.95f},{Blur,.75f},{WraithDetune,30},{WraithMix,.75f},{Reverse,1},{Feedback,.6f},{DelayMix,.45f},
+              {Character,0},{Decay,6},{ReverbMix,.5f},{ChoirOn,0},{Cutoff,4200},{Darkness,.35f}}),
+        make("Witch's Lament", "Moving filters and a crying 'oo' choir a fourth above; echoes fall by semitones.",
+             {{Cutoff,2800},{Resonance,.6f},{FilterMovement,.6f},{FilterRate,.5f},{Interval,2},{Formant,.05f},{ChoirMovement,.85f},
+              {ChoirDetune,35},{ChoirBlend,.65f},{Voices,2},{Descent,1},{DelaySync,3},{Feedback,.5f},{DelayMix,.4f},
+              {Instability,.5f},{Character,2},{Decay,5},{ReverbMix,.45f}}),
+        make("Eternal Winter", "Icy and bright: a thirty-second void, shimmer, and a frozen haze of detuned spectra.",
+             {{Cutoff,12000},{Darkness,.1f},{HighPass,200},{Character,3},{Decay,30},{Damping,.15f},{Shimmer,.5f},{ReverbMix,.8f},
+              {Blur,.88f},{WraithDetune,10},{WraithMix,.6f},{ChoirBlend,.2f},{Interval,4},{DelayMix,.2f},{Drive,2},{BloodMix,.2f}}),
+        make("The Final Ritual", "Everything at once: full Dread, octave-sinking echoes, rising crypt, roaring drive.",
+             {{Dread,.9f},{Drive,24},{Texture,.6f},{BloodMix,.8f},{Voices,4},{ChoirBlend,.6f},{Drone,.6f},{Ghost,.8f},{WraithMix,.6f},
+              {Descent,3},{Feedback,.65f},{DelayMix,.45f},{Character,3},{Decay,20},{CryptMode,1},{RiseTime,1.6f},{ReverbMix,.7f},{Cutoff,1600}}),
+        make("Ancient Spellbook", "Crackling parchment, a tomb ringing in E and a reverb that swells backwards into each note.",
+             {{Age,.9f},{Dust,.55f},{Drive,10},{BloodMix,.7f},{Tomb,.5f},{TombNote,4},{TombOctave,2},{TombRing,.6f},
+              {CryptMode,1},{RiseTime,1.3f},{Character,1},{Decay,6},{ReverbMix,.6f},{DelaySync,1},{Diffusion,.6f},{DelayMix,.3f},
+              {ChoirBlend,.2f},{WraithMix,.3f}}),
+        make("Throne of Shadows", "Slow two-bar filter breathing, a deep choir and a cathedral that never ends.",
+             {{Cutoff,950},{Darkness,.75f},{FilterMovement,.4f},{FilterSync,4},{Voices,4},{Interval,0},{ChoirBlend,.6f},{Drone,.45f},
+              {Character,1},{Decay,13},{ReverbMix,.65f},{DelaySync,6},{Descent,2},{Feedback,.5f},{DelayMix,.3f},{Drive,14},{BloodMix,.6f}})
     }};
     return bank;
 }

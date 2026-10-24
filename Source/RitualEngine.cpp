@@ -40,18 +40,20 @@ std::array<float, 2> RitualEngine::constrain(float xValue, float yValue) noexcep
     const auto w = weights(xValue, yValue);
     return {w.ruin + 0.5f * w.spirit, w.shadow + w.ruin};
 }
-Frame RitualEngine::process(const Frame& manual, float bpm) noexcept {
+Frame RitualEngine::processBlock(const Frame& manual, float bpm, int samples) noexcept {
+    samples = std::max(1, samples);
     const float validBpm = std::isfinite(bpm) ? std::clamp(bpm, 20.0f, 400.0f) : 120.0f;
     const double rate = manual[MotionSync] >= 0.5f ? validBpm / 960.0 : std::clamp(manual[MotionRate], 0.01f, 1.0f);
     // A free-running phase avoids discontinuity when the host starts or stops.
     // Sync follows the host BPM rather than forcibly resetting to bar position.
-    phase += rate / sampleRate;
-    if (phase >= 1.0) {
+    phase += rate * samples / sampleRate;
+    while (phase >= 1.0) {
         phase -= 1.0;
         wanderFromX = wanderToX; wanderFromY = wanderToY;
         wanderToX = randomSigned(); wanderToY = randomSigned();
     }
-    if (controlCounter-- <= 0) {
+    controlCounter -= samples;
+    if (controlCounter < 0) {
         controlCounter = 31;
         const int pattern = std::clamp(static_cast<int>(std::lround(manual[MotionPattern])), 0, 2);
         if (pattern == 0) {
@@ -71,8 +73,9 @@ Frame RitualEngine::process(const Frame& manual, float bpm) noexcept {
     const auto position = constrain(manual[RitualX] + motionX * motionAmount,
                                     manual[RitualY] + motionY * motionAmount);
     if (!initialized) { displayX = position[0]; displayY = position[1]; initialized = true; }
-    displayX += coordinateSlew * (position[0] - displayX);
-    displayY += coordinateSlew * (position[1] - displayY);
+    const double slew = samples == 1 ? coordinateSlew : 1.0 - std::pow(1.0 - coordinateSlew, samples);
+    displayX += slew * (position[0] - displayX);
+    displayY += slew * (position[1] - displayY);
     const auto w = weights(static_cast<float>(displayX), static_cast<float>(displayY));
     const float amount = safeUnit(manual[RitualOn]);
     Frame out = manual;
