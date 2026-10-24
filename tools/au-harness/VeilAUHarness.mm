@@ -261,28 +261,45 @@ struct Meter {
 // AUv2 API host.
 struct V2Host {
     AudioUnit unit = nullptr;
+    Report* report = nullptr;   // optional: trace each configuration call
+    bool callbackInstalled = false;
     Source source;
     double sampleRate = 48000.0;
     UInt32 inChannels = 2, outChannels = 2, maxFrames = 512;
     Float64 sampleTime = 0;
     std::vector<std::vector<float>> outputs;
 
+    void trace(const char* step) { if (report != nullptr) report->trace(strf("configure %.0f Hz %u->%u: %s", sampleRate, unsigned(inChannels), unsigned(outChannels), step)); }
+
+    // Like a host changing sample rate or channel layout: uninitialise, set formats,
+    // initialise again. The input callback is installed once per instance, as hosts do.
     OSStatus configure(double sr, UInt32 in, UInt32 out, UInt32 frames = 512) {
         sampleRate = sr; inChannels = in; outChannels = out; maxFrames = frames;
         source.sampleRate = sr;
+        trace("uninitialize");
         AudioUnitUninitialize(unit);
         auto inFormat = floatFormat(sr, in), outFormat = floatFormat(sr, out);
+        trace("input format");
         OSStatus s = AudioUnitSetProperty(unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &inFormat, sizeof(inFormat));
         if (s != noErr) return s;
+        trace("output format");
         s = AudioUnitSetProperty(unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &outFormat, sizeof(outFormat));
         if (s != noErr) return s;
+        trace("maximum frames");
         s = AudioUnitSetProperty(unit, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, &maxFrames, sizeof(maxFrames));
         if (s != noErr) return s;
-        AURenderCallbackStruct callback { pullInput, &source };
-        s = AudioUnitSetProperty(unit, kAudioUnitProperty_SetRenderCallback, kAudioUnitScope_Input, 0, &callback, sizeof(callback));
-        if (s != noErr) return s;
+        if (!callbackInstalled) {
+            trace("input callback");
+            AURenderCallbackStruct callback { pullInput, &source };
+            s = AudioUnitSetProperty(unit, kAudioUnitProperty_SetRenderCallback, kAudioUnitScope_Input, 0, &callback, sizeof(callback));
+            if (s != noErr) return s;
+            callbackInstalled = true;
+        }
         outputs.assign(out, std::vector<float>(maxFrames, 0.0f));
-        return AudioUnitInitialize(unit);
+        trace("initialize");
+        s = AudioUnitInitialize(unit);
+        trace("done");
+        return s;
     }
 
     RenderResult render(double seconds, double skipSeconds) {
@@ -672,6 +689,7 @@ void v2Suite(Report& r, AudioComponent component, bool outOfProcess, bool useWin
         for (const auto& [id, original] : changed) setParameter(unit, id, original);
     }
     r.trace("reconfiguring for other sample rates");
+    host.report = &r;
 
     // 7. Other rates and block sizes.
     for (double rate : { 44100.0, 96000.0 }) {
@@ -745,19 +763,33 @@ void auAudioUnitSuite(Report& r, AudioComponentDescription description, bool use
     Source* src = &source;
     float* in0 = inScratch0.data();
     float* in1 = inScratch1.data();
+    // What the system hands the pull block: buffer count, null mData, byte sizes.
+    struct PullObservation { UInt32 buffers = 0, nullData = 0, firstByteSize = 0, firstChannels = 0; bool seen = false; };
+    PullObservation observed;
+    PullObservation* seen = &observed;
     AURenderPullInputBlock pull = ^AUAudioUnitStatus(AudioUnitRenderActionFlags*, const AudioTimeStamp*, AUAudioFrameCount frames,
                                                        NSInteger, AudioBufferList* input) {
+        if (!seen->seen) {
+            seen->seen = true;
+            seen->buffers = input->mNumberBuffers;
+            seen->firstByteSize = input->mNumberBuffers > 0 ? input->mBuffers[0].mDataByteSize : 0;
+            seen->firstChannels = input->mNumberBuffers > 0 ? input->mBuffers[0].mNumberChannels : 0;
+        }
         for (UInt32 b = 0; b < input->mNumberBuffers; ++b) {
             if (input->mBuffers[b].mData == nullptr) {
+                ++seen->nullData;
                 input->mBuffers[b].mData = b == 0 ? in0 : in1;
-                input->mBuffers[b].mDataByteSize = frames * sizeof(float);
             }
+            input->mBuffers[b].mDataByteSize = frames * sizeof(float);
         }
         src->fill(input, frames);
         return noErr;
     };
+    AudioUnitRenderActionFlags lastFlags = 0;
     AURenderBlock renderBlock = unit.renderBlock;
     Float64 sampleTime = 0;
+    // Hosts either pass their own output buffers or null pointers (the unit supplies them).
+    bool hostOutputBuffers = true;
     auto render = [&](double seconds, double skipSeconds) {
         RenderResult result;
         const auto total = size_t(seconds * 48000.0), skip = size_t(skipSeconds * 48000.0);
@@ -773,13 +805,18 @@ void auAudioUnitSuite(Report& r, AudioComponentDescription description, bool use
             for (UInt32 c = 0; c < 2; ++c) {
                 abl->mBuffers[c].mNumberChannels = 1;
                 abl->mBuffers[c].mDataByteSize = frames * sizeof(float);
-                abl->mBuffers[c].mData = outs[c];
+                abl->mBuffers[c].mData = hostOutputBuffers ? outs[c] : nullptr;
             }
             AudioUnitRenderActionFlags flags = 0;
             AudioTimeStamp ts {};
             ts.mFlags = kAudioTimeStampSampleTimeValid;
             ts.mSampleTime = sampleTime;
             result.status = renderBlock(&flags, &ts, frames, 0, abl, pull);
+            if (result.status == noErr && (abl->mBuffers[0].mData == nullptr || abl->mBuffers[1].mData == nullptr)) {
+                result.status = kAudioUnitErr_FailedInitialization;   // unit left an output buffer unset
+                break;
+            }
+            lastFlags = flags;
             if (result.status != noErr) break;
             const float* channels[2] = { static_cast<const float*>(abl->mBuffers[0].mData), static_cast<const float*>(abl->mBuffers[1].mData) };
             meter.add(channels, 2, frames, doneFrames, skip, source);
@@ -792,6 +829,17 @@ void auAudioUnitSuite(Report& r, AudioComponentDescription description, bool use
     };
 
     auto res = render(3.0, 1.0);
+    if (res.status == noErr && res.peak == 0.0f) {
+        r.info("host-supplied output buffers stayed silent", "retrying with unit-supplied output buffers");
+        hostOutputBuffers = false;
+        auto retry = render(3.0, 1.0);
+        r.info("unit-supplied output buffers", retry.describe());
+        if (retry.status == noErr && retry.peak > 0.0f) res = retry;
+        else hostOutputBuffers = true;
+    }
+    r.info("pull block observations", strf("buffers=%u channels/buffer=%u first byte size=%u null-mData pulls=%u; last render flags=0x%x",
+                                           unsigned(observed.buffers), unsigned(observed.firstChannels), unsigned(observed.firstByteSize),
+                                           unsigned(observed.nullData), unsigned(lastFlags)));
     r.check(res.status == noErr, "renderBlock calls succeed", res.describe());
     r.check(res.pulls > 0, "plug-in pulls its input");
     r.check(res.finite && res.rmsDb() > -40.0, "default settings are audible", strf("%.1f dBFS", res.rmsDb()));
