@@ -219,7 +219,15 @@ The chain, from the report's system log:
   - **Control:** Apple's own AULowpass through the same harness route fails too: status −10876 (`kAudioUnitErr_NoConnection`) and silence.
   - So the harness does not yet drive this route correctly, and it cannot judge VEIL. It keeps running and is reported in CI, but does not fail the build.
   - The brief's required routes (AUv2 API in-process and out-of-process, §7.2) are the gates. Making this route work, with the Apple control as its reference, is follow-up work.
-- **GarageBand on the user's Mac:** pending (Milestone 1 gate).
+- **CI green: [run 40070147382](https://github.com/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40070147382) (`76643c9`).** It verified:
+  - universal build and tests on both slices;
+  - the universal/plist gate, signing and packaging;
+  - the quarantined download installed with `install-mac.sh` ("VEIL is installed and validated.");
+  - `auval` AU VALIDATION SUCCEEDED for arm64 and x86_64;
+  - harness `--strict`: v2 out-of-process 47/47 and v2 in-process 49/49 on **arm64 and x86_64**.
+
+  `VEIL-macOS-Universal` was published as the installable artifact.
+- **GarageBand on the user's Mac:** pending (Milestone 1 gate). Steps are in `docs/MANUAL_TEST.md` section B.
 
 ---
 
