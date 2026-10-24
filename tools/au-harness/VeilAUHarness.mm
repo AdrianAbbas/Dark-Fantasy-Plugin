@@ -92,6 +92,8 @@ struct Report {
     }
     void skip(const std::string& name, const std::string& why) { ++skipped; line("SKIP", name, why); }
     void info(const std::string& name, const std::string& detail) { line("INFO", name, detail); }
+    // Progress markers around host calls, so a crash shows exactly where it happened.
+    void trace(const std::string& what) { line("TRACE", what, ""); }
 };
 
 //==============================================================================
@@ -660,12 +662,16 @@ void v2Suite(Report& r, AudioComponent component, bool outOfProcess, bool useWin
                 }
                 r.check(s2 == noErr && mismatches == 0, "state restores every parameter in a fresh instance",
                         strf("set=%s changed=%zu mismatches=%d %s", statusText(s2).c_str(), changed.size(), mismatches, firstMismatch.c_str()));
+                r.trace("disposing the second instance");
                 AudioComponentInstanceDispose(fresh);
             }
         }
+        r.trace("releasing ClassInfo");
         if (state != nullptr) CFRelease(state);
+        r.trace("restoring changed parameters");
         for (const auto& [id, original] : changed) setParameter(unit, id, original);
     }
+    r.trace("reconfiguring for other sample rates");
 
     // 7. Other rates and block sizes.
     for (double rate : { 44100.0, 96000.0 }) {

@@ -65,13 +65,17 @@ strict=""  # becomes -strict when this auval supports it
 /usr/bin/auval -h 2>&1 | /usr/bin/grep -qE -- '(^|[[:space:]])-strict([[:space:]]|$)' && strict="-strict"
 # shellcheck disable=SC2086  # $strict is empty or one flag
 run_check auval-arm64 /usr/bin/arch -arm64 /usr/bin/auval $strict -v aufx Vel1 Veil
-run_check harness-arm64 /usr/bin/arch -arm64 "$harness" --strict
+# One process per hosting route, so a crash in one cannot hide the others.
+suites="v2-oop auaudiounit v2-inproc"
+for suite in $suites; do run_check "harness-arm64-$suite" /usr/bin/arch -arm64 "$harness" --strict --only "$suite"; done
 if /usr/bin/arch -x86_64 /usr/bin/true 2>/dev/null; then
     # shellcheck disable=SC2086
     run_check auval-x86_64 /usr/bin/arch -x86_64 /usr/bin/auval $strict -v aufx Vel1 Veil
-    run_check harness-x86_64 /usr/bin/arch -x86_64 "$harness" --strict
+    for suite in $suites; do run_check "harness-x86_64-$suite" /usr/bin/arch -x86_64 "$harness" --strict --only "$suite"; done
 else
     echo "::error::Rosetta unavailable: the x86_64 slice was not validated"; status=1
 fi
 grep -h -E "^(FAIL|SUMMARY)" "$logs"/harness-*.txt || true
+python3 "$(dirname "${BASH_SOURCE[0]}")/ci-crash-summary.py" 60 VeilAUHarness AUHostingService auval VEIL > "$logs/crashes.txt" 2>&1 || true
+cat "$logs/crashes.txt"
 exit $status

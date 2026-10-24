@@ -51,14 +51,14 @@ jobs:
       # Annotations are readable through the REST API; GitHub keeps at most 10 per step.
       - name: Publish install and arm64 harness logs as annotations
         if: always()
-        run: bash scripts/ci-annotate.sh --condense build/ci-logs/quarantine.txt build/ci-logs/install-mac.txt build/ci-logs/harness-arm64.txt
+        run: bash scripts/ci-annotate.sh --condense build/ci-logs/quarantine.txt build/ci-logs/install-mac.txt build/ci-logs/harness-arm64-*.txt
       - name: Publish x86_64 harness and auval logs as annotations
         if: always()
         run: |
           for f in build/ci-logs/auval-*.txt; do
             if [[ -f "$f" ]]; then tail -25 "$f" > "$f.tail"; fi
           done
-          bash scripts/ci-annotate.sh --condense build/ci-logs/harness-x86_64.txt build/ci-logs/auval-*.txt.tail
+          bash scripts/ci-annotate.sh --condense build/ci-logs/harness-x86_64-*.txt build/ci-logs/crashes.txt build/ci-logs/auval-*.txt.tail
       - name: Upload installable package (only when every check passed)
         uses: actions/upload-artifact@v4
         with:
