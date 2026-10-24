@@ -1,0 +1,34 @@
+ProductName:		macOS
+ProductVersion:		14.8.9
+BuildVersion:		23J631
+arm64
+build/reused/VEIL.component/Contents/MacOS/VEIL: Mach-O 64-bit bundle arm64
+arm64
+Dict {
+    CFBundleName = VEIL
+    CFBundleIdentifier = audio.veil.processor
+    CFBundleVersion = 1.0.0
+    CFBundleExecutable = VEIL
+    CFBundleDisplayName = VEIL
+    AudioComponents = Array {
+        Dict {
+            manufacturer = Veil
+            resourceUsage = Dict {
+                temporary-exception.files.all.read-write = true
+                network.client = true
+            }
+            subtype = Vel1
+            version = 65536
+            type = aufx
+            factoryFunction = VEILAUFactory
+            name = Veil Audio: VEIL
+            description = Dark Fantasy Audio Processor
+        }
+    }
+    NSHighResolutionCapable = true
+    CFBundleSignature = ????
+    CFBundleIconFile = 
+    CFBundlePackageType = BNDL
+    NSHumanReadableCopyright = 
+    CFBundleShortVersionString = 1.0.0
+}

@@ -1,0 +1,766 @@
+ProductName:		macOS
+ProductVersion:		14.8.9
+BuildVersion:		23J631
+arm64
+build/reused/VEIL.component/Contents/MacOS/VEIL: Mach-O 64-bit bundle arm64
+arm64
+Dict {
+    CFBundleName = VEIL
+    CFBundleIdentifier = audio.veil.processor
+    CFBundleVersion = 1.0.0
+    CFBundleExecutable = VEIL
+    CFBundleDisplayName = VEIL
+    AudioComponents = Array {
+        Dict {
+            manufacturer = Veil
+            resourceUsage = Dict {
+                temporary-exception.files.all.read-write = true
+                network.client = true
+            }
+            subtype = Vel1
+            version = 65536
+            type = aufx
+            factoryFunction = VEILAUFactory
+            name = Veil Audio: VEIL
+            description = Dark Fantasy Audio Processor
+        }
+    }
+    NSHighResolutionCapable = true
+    CFBundleSignature = ????
+    CFBundleIconFile = 
+    CFBundlePackageType = BNDL
+    NSHumanReadableCopyright = 
+    CFBundleShortVersionString = 1.0.0
+}
+Original bundle signature verification exit: 1
+build/reused/VEIL.component: code has no resources but signature indicates they must be present
+build/reused/VEIL.component: replacing existing signature
+build/reused/VEIL.component: valid on disk
+build/reused/VEIL.component: satisfies its Designated Requirement
+/Users/runner/Library/Audio/Plug-Ins/Components/VEIL.component: valid on disk
+/Users/runner/Library/Audio/Plug-Ins/Components/VEIL.component: satisfies its Designated Requirement
+AU registered after discovery attempt 2.
+
+    AU Validation Tool
+    Version: 1.10.0 
+    Copyright 2003-2019, Apple Inc. All Rights Reserved.
+    Specify -h (-help) for command options
+
+aufx Vel1 Veil  -  Veil Audio: VEIL
+aufx bpas appl  -  Apple: AUBandpass
+aufx dcmp appl  -  Apple: AUDynamicsProcessor
+aufx dely appl  -  Apple: AUDelay
+aufx dist appl  -  Apple: AUDistortion
+aufx filt appl  -  Apple: AUFilter
+aufx greq appl  -  Apple: AUGraphicEQ
+aufx hpas appl  -  Apple: AUHipass
+aufx hshf appl  -  Apple: AUHighShelfFilter
+aufx lmtr appl  -  Apple: AUPeakLimiter
+aufx lpas appl  -  Apple: AULowpass
+aufx lshf appl  -  Apple: AULowShelfFilter
+aufx mcmp appl  -  Apple: AUMultibandCompressor
+aufx mrev appl  -  Apple: AUMatrixReverb
+aufx nbeq appl  -  Apple: AUNBandEQ
+aufx nsnd appl  -  Apple: AUNetSend
+aufx nutp appl  -  Apple: AUNewPitch
+aufx pmeq appl  -  Apple: AUParametricEQ
+aufx raac appl  -  Apple: AURoundTripAAC
+aufx rogr appl  -  Apple: AURogerBeep
+aufx rvb2 appl  -  Apple: AUReverb2
+aufx sdly appl  -  Apple: AUSampleDelay
+aufx tmpt appl  -  Apple: AUPitch
+aufx vois appl  -  Apple: AUSoundIsolation
+aupn ambi appl  -  Apple: AUSoundFieldPanner
+aupn hrtf appl  -  Apple: HRTFPanner
+aupn sphr appl  -  Apple: AUSphericalHeadPanner
+aupn vbas appl  -  Apple: AUVectorPanner
+aumu dls  appl  -  Apple: DLSMusicDevice
+aumu msyn appl  -  Apple: AUMIDISynth
+aumu samp appl  -  Apple: AUSampler
+aumx 3dem appl  -  Apple: AUSpatialMixer
+aumx 3dmx appl  -  Apple: AUMixer3D
+aumx mcmx appl  -  Apple: AUMultiChannelMixer
+aumx mspl appl  -  Apple: AUMultiSplitter
+aumx mxmx appl  -  Apple: AUMatrixMixer
+aumx smxr appl  -  Apple: AUMixer
+aufc conv appl  -  Apple: AUConverter
+aufc defr appl  -  Apple: AUDeferredRenderer
+aufc ipto appl  -  Apple: AUNotQuiteSoSimpleTime
+aufc merg appl  -  Apple: AUMerger
+aufc nutp appl  -  Apple: AUNewTimePitch
+aufc splt appl  -  Apple: AUSplitter
+aufc tmpt appl  -  Apple: AUTimePitch
+aufc vari appl  -  Apple: AUVarispeed
+auou ahal appl  -  Apple: AudioDeviceOutput
+auou atap appl  -  Apple: AUAudioTapIO
+auou def  appl  -  Apple: DefaultOutputUnit
+auou genr appl  -  Apple: GenericOutput
+auou rioc appl  -  Apple: AUAudioIO
+auou sys  appl  -  Apple: SystemOutputUnit
+auou vpio appl  -  Apple: AUVoiceProcessor
+augn afpl appl  -  Apple: AUAudioFilePlayer
+augn nrcv appl  -  Apple: AUNetReceive
+augn sspl appl  -  Apple: AUScheduledSoundPlayer
+augn ttsp appl  -  Apple: AUSpeechSynthesis
+auol tmpt appl  -  Apple: AUTimePitch
+auol vari appl  -  Apple: AUVarispeed
+
+    AU Validation Tool
+    Version: 1.10.0 
+    Copyright 2003-2019, Apple Inc. All Rights Reserved.
+    Specify -h (-help) for command options
+
+--------------------------------------------------
+VALIDATING AUDIO UNIT: 'aufx' - 'Vel1' - 'Veil'
+--------------------------------------------------
+Manufacturer String: Veil Audio
+AudioUnit Name: VEIL
+Component Version: 1.0.0 (0x10000)
+
+* * PASS
+--------------------------------------------------
+TESTING OPEN TIMES:
+COLD:
+Time to open AudioUnit:         5.788 ms
+WARM:
+Time to open AudioUnit:         1.115  ms
+This AudioUnit is a version 2 implementation.
+FIRST TIME:
+Time for initialization:        0.129 ms
+
+* * PASS
+--------------------------------------------------
+VERIFYING DEFAULT SCOPE FORMATS:
+Input Scope Bus Configuration:
+ Default Bus Count:1
+    Bus Name: Input
+    Default Format: AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+    Has Channel Layouts: 0x640001 0x650002 0x660002 0x670002 0x6A0002 
+    Default Layout:
+	Tag=0x650002, Num Chan Descs=0
+
+Output Scope Bus Configuration:
+ Default Bus Count:1
+    Bus Name: Output
+    Default Format: AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+    Has Channel Layouts: 0x640001 0x650002 0x660002 0x670002 0x6A0002 
+    Default Layout:
+	Tag=0x650002, Num Chan Descs=0
+
+* * PASS
+--------------------------------------------------
+VERIFYING REQUIRED PROPERTIES:
+
+* * PASS
+--------------------------------------------------
+VERIFYING RECOMMENDED PROPERTIES:
+  VERIFYING PROPERTY: Latency
+    PASS
+  VERIFYING PROPERTY: Tail Time
+    PASS
+  VERIFYING PROPERTY: Bypass Effect
+    PASS
+
+* * PASS
+--------------------------------------------------
+VERIFYING OPTIONAL PROPERTIES:
+
+* * PASS
+--------------------------------------------------
+VERIFYING SPECIAL PROPERTIES:
+
+VERIFYING CUSTOM UI
+Cocoa Views Available: 1
+  JUCE_AUCocoaViewClass_99a28c322fda678b
+    PASS
+
+HAS FACTORY PRESETS
+    ID:   0    Name: Forgotten Kingdom
+    ID:   1    Name: Cathedral at Midnight
+    ID:   2    Name: The Hollow Choir
+    ID:   3    Name: Abyssal Drone
+    ID:   4    Name: Cursed Forest
+    ID:   5    Name: Fallen Angel
+    ID:   6    Name: Ashes of a King
+    ID:   7    Name: Moonlit Ruins
+    ID:   8    Name: The Black Citadel
+    ID:   9    Name: Ghosts of the Chapel
+    ID:  10    Name: Witch's Lament
+    ID:  11    Name: Eternal Winter
+    ID:  12    Name: The Final Ritual
+    ID:  13    Name: Ancient Spellbook
+    ID:  14    Name: Throne of Shadows
+
+VERIFYING CLASS INFO
+    PASS
+
+TESTING HOST CALLBACKS
+    PASS
+
+* * PASS
+--------------------------------------------------
+PUBLISHED PARAMETER INFO:
+
+# # # 61 Global Scope Parameters:
+Parameter ID:96511
+Name: Age
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.1200000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:3027047
+Name: Spectral Blur
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.2000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:3095218
+Name: Dust
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.0000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:62276150
+Name: The Wraith
+Parameter Type: Boolean
+Values: Minimum = Off, Default = On, Maximum = On
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:95459258
+Name: Decay
+Parameter Type: Generic
+Values: Minimum = 0.5000000, Default = 5.0000000, Maximum = 20.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:95852457
+Name: Drift
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.2000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:95852938
+Name: Drive
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 3.0000000, Maximum = 24.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:98331279
+Name: Ghost
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.2000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:109532587
+Name: Slope
+Parameter Type: Indexed
+Values: Minimum = 12 dB, Default = 24 dB, Maximum = 24 dB
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+Parameter has Value Strings
+Num Strings = 2
+Value: 0,  String: 12 dB
+Value: 1,  String: 24 dB
+  -parameter PASS
+
+Parameter ID:109637894
+Name: Space
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.6500000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:157452366
+Name: Resonance
+Parameter Type: Generic
+Values: Minimum = 0.1000000, Default = 0.2500000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:387933113
+Name: Wet / Dry
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.6500000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:389880618
+Name: Crypt Mix
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.3200000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:462099667
+Name: High-Pass
+Parameter Type: Generic
+Values: Minimum = 20.0000000, Default = 35.0000000, Maximum = 800.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:570418373
+Name: Interval
+Parameter Type: Indexed
+Values: Minimum = Octave below, Default = Fifth above, Maximum = Unison
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+Parameter has Value Strings
+Num Strings = 5
+Value: 0,  String: Octave below
+Value: 1,  String: Fifth below
+Value: 2,  String: Fifth above
+Value: 3,  String: Octave above
+Value: 4,  String: Unison
+  -parameter PASS
+
+Parameter ID:574975266
+Name: Movement
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.2500000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:594350200
+Name: Movement Rate
+Parameter Type: Generic
+Values: Minimum = 0.0200000, Default = 0.1500000, Maximum = 4.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:594402867
+Name: Movement Sync
+Parameter Type: Indexed
+Values: Minimum = Free, Default = Free, Maximum = 4 beats
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+Parameter has Value Strings
+Num Strings = 2
+Value: 0,  String: Free
+Value: 1,  String: 4 beats
+  -parameter PASS
+
+Parameter ID:681800402
+Name: The Echoes
+Parameter Type: Boolean
+Values: Minimum = Off, Default = On, Maximum = On
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:729666843
+Name: Texture
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.1800000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:751733906
+Name: The Choir
+Parameter Type: Boolean
+Values: Minimum = Off, Default = On, Maximum = On
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:772786938
+Name: Motion Pattern
+Parameter Type: Indexed
+Values: Minimum = Circle, Default = Circle, Maximum = Wander
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+Parameter has Value Strings
+Num Strings = 3
+Value: 0,  String: Circle
+Value: 1,  String: Pendulum
+Value: 2,  String: Wander
+  -parameter PASS
+
+Parameter ID:773352680
+Name: Bypass
+Parameter Type: Boolean
+Values: Minimum = Off, Default = Off, Maximum = On
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:798419949
+Name: Cutoff
+Parameter Type: Generic
+Values: Minimum = 80.0000000, Default = 6500.0000000, Maximum = 18000.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:816144857
+Name: Echoes Mix
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.2000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:827409568
+Name: Pre-Delay
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 35.0000000, Maximum = 200.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:873230368
+Name: Output
+Parameter Type: Generic
+Values: Minimum = -24.0000000, Default = -3.0000007, Maximum = 12.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:881080983
+Name: Freeze
+Parameter Type: Boolean
+Values: Minimum = Off, Default = Off, Maximum = On
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:933347518
+Name: Choir Blend
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.1300000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:961969367
+Name: The Abyss
+Parameter Type: Boolean
+Values: Minimum = Off, Default = On, Maximum = On
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1022338836
+Name: Width
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.9000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1047471085
+Name: The Crypt
+Parameter Type: Boolean
+Values: Minimum = Off, Default = On, Maximum = On
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1067733292
+Name: Detune
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 7.0000000, Maximum = 30.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1095034466
+Name: Ritual Engine
+Parameter Type: Boolean
+Values: Minimum = Off, Default = On, Maximum = On
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1099846370
+Name: Reverse
+Parameter Type: Boolean
+Values: Minimum = Off, Default = Off, Maximum = On
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1212976021
+Name: Ritual X
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.5000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1212976022
+Name: Ritual Y
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.5000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1251799411
+Name: Stereo Spread
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.6000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1253086416
+Name: Detune
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 4.0000000, Maximum = 30.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1259109549
+Name: Motion Depth
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.4000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1317489605
+Name: Diffusion
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.2500000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1318872768
+Name: Low Cut
+Parameter Type: Generic
+Values: Minimum = 30.0000000, Default = 180.0000153, Maximum = 1000.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1322873343
+Name: Damping
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.6000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1336493441
+Name: Voice Count
+Parameter Type: Generic
+Values: Minimum = 1, Default = 3, Maximum = 4
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1426503094
+Name: Motion Rate
+Parameter Type: Generic
+Values: Minimum = 0.0100000, Default = 0.0400000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1426555761
+Name: Motion Sync
+Parameter Type: Indexed
+Values: Minimum = Free, Default = Free, Maximum = 16 beats
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+Parameter has Value Strings
+Num Strings = 2
+Value: 0,  String: Free
+Value: 1,  String: 16 beats
+  -parameter PASS
+
+Parameter ID:1437187330
+Name: Damping
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.6500000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1470039715
+Name: Formant Character
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.4500000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1493757442
+Name: Blood Mix
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.2800000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1564195625
+Name: Chamber
+Parameter Type: Indexed
+Values: Minimum = Forgotten Chapel, Default = Ancient Cathedral, Maximum = Endless Void
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+Parameter has Value Strings
+Num Strings = 4
+Value: 0,  String: Forgotten Chapel
+Value: 1,  String: Ancient Cathedral
+Value: 2,  String: Underground Crypt
+Value: 3,  String: Endless Void
+  -parameter PASS
+
+Parameter ID:1678364350
+Name: Time Sync
+Parameter Type: Indexed
+Values: Minimum = Free, Default = Free, Maximum = 1/2
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+Parameter has Value Strings
+Num Strings = 5
+Value: 0,  String: Free
+Value: 1,  String: 1/8
+Value: 2,  String: 1/4
+Value: 3,  String: Dotted 1/4
+Value: 4,  String: 1/2
+  -parameter PASS
+
+Parameter ID:1678378736
+Name: Time
+Parameter Type: Generic
+Values: Minimum = 20.0000000, Default = 439.9999695, Maximum = 2000.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+WARNING: retrievedValue = 0.460566 (was 0.460566), Parameter did not retain default value when set
+  -parameter PASS
+
+Parameter ID:1706566249
+Name: Input
+Parameter Type: Generic
+Values: Minimum = -24.0000000, Default = 0.0000000, Maximum = 24.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1741803213
+Name: Darkness
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.3000000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1842231367
+Name: Movement
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.1200000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1855181860
+Name: Instability
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.0800000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1930558693
+Name: Wraith Mix
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.1600000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1955982213
+Name: Feedback
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.3800000, Maximum = 0.9000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:1990308917
+Name: Ritual Motion
+Parameter Type: Boolean
+Values: Minimum = Off, Default = Off, Maximum = On
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:2061464833
+Name: Shimmer
+Parameter Type: Generic
+Values: Minimum = 0.0000000, Default = 0.0800000, Maximum = 1.0000000
+Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+  -parameter PASS
+
+Parameter ID:2126395769
+Name: Ancient Blood
+Parameter Type: Boolean
+Values: Minimum = Off, Default = On, Maximum = On
+Flags: Values Have Strings, High Resolution, Readable, Writable 
+  -parameter PASS
+
+Testing that parameters retain value across reset and initialization
+  PASS
+
+* * PASS
+--------------------------------------------------
+FORMAT TESTS:
+
+Reported Channel Capabilities (explicit):
+      [1, 1]  [2, 2]  
+
+Input/Output Channel Handling:
+1-1   1-2   1-4   1-5   1-6   1-7   1-8   2-2   2-4   2-5   2-6   2-7   2-8   4-4   4-5   5-5   6-6   7-7   8-8
+X                                         X                                                                       
+
+# # AudioChannelLayouts (5), Input Scope:
+ChannelLayout is Writable: T
+The Unit publishes the following Channel Layouts:
+  0x640001, 0x650002, 0x660002, 0x670002, 0x6A0002, 
+
+Is Audio Channel Layout Available:
+Mono    Stereo  Binau.  AU_4    Ambi.   AU_5    AU_5_0  AU_6    AU_6_0  AU_7_0  AU_7_0F AU_8    AU_5_1  AU_6_1  AU_7_1  AU_7_1F 
+X       X       X                                                                                                               
+
+Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+Current Format Tag = 0x650002, New Format Tag = 0x640001, Success - did not reset format with mis-matched layout
+
+Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+Current Format Tag = 0x650002, New Format Tag = 0x650002, Successsful
+
+Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+Current Format Tag = 0x650002, New Format Tag = 0x6A0002, Successsful
+
+# # AudioChannelLayouts (5), Output Scope:
+ChannelLayout is Writable: T
+The Unit publishes the following Channel Layouts:
+  0x640001, 0x650002, 0x660002, 0x670002, 0x6A0002, 
+
+Is Audio Channel Layout Available:
+Mono    Stereo  Binau.  AU_4    Ambi.   AU_5    AU_5_0  AU_6    AU_6_0  AU_7_0  AU_7_0F AU_8    AU_5_1  AU_6_1  AU_7_1  AU_7_1F 
+X       X       X                                                                                                               
+
+Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+Current Format Tag = 0x650002, New Format Tag = 0x640001, Success - did not reset format with mis-matched layout
+
+Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+Current Format Tag = 0x650002, New Format Tag = 0x650002, Successsful
+
+Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+Current Format Tag = 0x650002, New Format Tag = 0x6A0002, Successsful
+
+* * PASS
+--------------------------------------------------
+RENDER TESTS:
+
+Input Format: AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+Output Format: AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+Render Test at 512 frames
+Slicing Render Test at 64 frames
+  PASS
+
+
+Render Test at 64 frames, sample rate: 22050 Hz
+Render Test at 137 frames, sample rate: 96000 Hz
+Render Test at 4096 frames, sample rate: 48000 Hz
+Render Test at 4096 frames, sample rate: 192000 Hz
+Render Test at 4096 frames, sample rate: 11025 Hz
+Render Test at 512 frames, sample rate: 44100 Hz
+  PASS
+
+1 Channel Test:
+Render Test at 512 frames
+  PASS
+
+Checking connection semantics:
+Connection format:
+AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+  PASS
+
+Bad Max Frames - Render should fail
+  PASS
+
+Checking parameter setting
+Using AudioUnitSetParameter
+Using AudioUnitScheduleParameter
+  PASS
+
+Checking ramped parameter scheduling
+  PASS
+
+Test MIDI
+  PASS
+
+* * PASS
+--------------------------------------------------
+AU VALIDATION SUCCEEDED.
+--------------------------------------------------
+Apple auval exit code: 0

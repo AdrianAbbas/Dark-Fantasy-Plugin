@@ -1,0 +1,2 @@
+build/reused/VEIL.component: valid on disk
+build/reused/VEIL.component: satisfies its Designated Requirement

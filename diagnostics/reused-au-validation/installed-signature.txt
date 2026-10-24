@@ -1,0 +1,2 @@
+/Users/runner/Library/Audio/Plug-Ins/Components/VEIL.component: valid on disk
+/Users/runner/Library/Audio/Plug-Ins/Components/VEIL.component: satisfies its Designated Requirement
