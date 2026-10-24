@@ -1,35 +1,51 @@
-name: Validate existing AU bundle without rebuilding
+name: Retrieve final AU run evidence
 on:
   push:
     branches: [ci/au-diagnostics]
 permissions:
+  actions: read
   contents: write
 jobs:
-  registration:
+  recover:
     if: github.actor != 'github-actions[bot]'
-    runs-on: macos-14
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Extract existing Apple Silicon build
+      - name: Retrieve validation logs and artifact metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p build/reused build/au-validation
-          ditto -x -k diagnostics/verified-au/VEIL-macOS-arm64-AU.zip build/reused
-      - name: Validate existing AU with corrected preflight
-        run: |
-          set -o pipefail
-          bash scripts/validate-au-macos.sh build/reused/VEIL.component build/au-validation 2>&1 | tee build/au-validation/complete.log
-      - name: Preserve complete registration diagnostics
+          mkdir -p diagnostics/final-au
+          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40060059145 > diagnostics/final-au/run.json
+          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40060059145/jobs > diagnostics/final-au/jobs.json
+          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40060059145/logs > diagnostics/final-au/logs.zip
+          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40060059145/artifacts > diagnostics/final-au/artifacts.json
+          artifact_id=$(python3 - <<'PY'
+          import json
+          data=json.load(open('diagnostics/final-au/artifacts.json'))
+          print(next(a['id'] for a in data['artifacts'] if a['name']=='VEIL-macOS-arm64-unsigned'))
+          PY
+          )
+          gh api "repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/artifacts/$artifact_id/zip" > /tmp/veil-native-artifact.zip
+          python3 - <<'PY'
+          import zipfile
+          from pathlib import Path
+          out=Path('diagnostics/final-au')
+          with zipfile.ZipFile('/tmp/veil-native-artifact.zip') as z:
+              assert z.testzip() is None
+              candidates=[n for n in z.namelist() if n.endswith('VEIL-macOS-arm64-AU.zip')]
+              assert len(candidates)==1,z.namelist()
+              (out/'VEIL-macOS-arm64-AU.zip').write_bytes(z.read(candidates[0]))
+          with zipfile.ZipFile(out/'logs.zip') as z:
+              for n in z.namelist():
+                  if n.endswith('_macos.txt') and '/' not in n:
+                      (out/'macos-complete.log').write_bytes(z.read(n))
+          PY
+      - name: Preserve validation evidence for retrieval
         if: always()
         run: |
-          mkdir -p diagnostics/reused-au-validation
-          cp -R build/au-validation/. diagnostics/reused-au-validation/
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add diagnostics/reused-au-validation
-          git commit -m 'Record native arm64 AU registration and validation diagnostics'
+          git add diagnostics
+          git commit -m 'Preserve Apple Silicon AU validation result and packaged component'
           git push origin HEAD:ci/au-diagnostics
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: VEIL-reused-AU-diagnostics
-          path: build/au-validation/
