@@ -202,9 +202,20 @@ The chain, from the report's system log:
 
 ### Verified so far
 
-- Linux: JUCE 8.0.16 build with VST3 and Standalone; **485 passed, 0 failed**.
-- macOS CI: pending (run for `4d78227`).
-- GarageBand on the user's Mac: pending (Milestone 1 gate).
+- **Linux:** JUCE 8.0.16 build with VST3 and Standalone; **485 passed, 0 failed**.
+- **macOS CI** (macOS 14.8.9 arm64 runner, runs for `4d78227`…`e606993`):
+  - universal build;
+  - processor tests on arm64 and on x86_64 under Rosetta;
+  - universal-binary and Info.plist gate (both slices; `sandboxSafe` true);
+  - whole-bundle signing and packaging.
+- **Quarantined install** (Chrome-style flag on every file): `install-mac.sh --ci` removes the flag, re-signs, registers, and gets `auval` PASS on **arm64 and x86_64**. auval's "1 to 2 Channel Render Test" now passes.
+- **Harness, per hosting route** (`e606993`):
+  - v2 in-process: 49/49 on arm64 and x86_64. Covers sound, bypass, parameters, all presets, state, 44.1/96 kHz, mono→mono, mono→stereo, and the Cocoa editor created and kept alive in a window.
+  - v2 out-of-process: 47/47 on arm64. Same coverage, plus the **remote editor view** delivered with a sensible size.
+- **Open (harness side, being fixed):**
+  - an intermittent trap in the harness process while reconfiguring an out-of-process instance (seen once on arm64, once on x86_64);
+  - the AUAudioUnit route returning exact zeros even in bypass, which means the remote side got silent input.
+- **GarageBand on the user's Mac:** pending (Milestone 1 gate).
 
 ---
 
