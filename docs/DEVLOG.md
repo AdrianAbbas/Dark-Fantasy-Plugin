@@ -133,6 +133,22 @@ The chain, from the report's system log:
 - CI reproduces the user's state: it quarantines the packaged bundle, installs it with that script, then runs `auval` and the strict harness.
 - Proper distribution to other people needs Developer ID signing and notarisation (optional CI path).
 
+**CI baseline experiments** ([run 40066816452](https://github.com/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40066816452), macOS 14.8.9 arm64 runner, Gatekeeper assessments enabled, harness on the old bundles):
+
+- **A, the green artifact as published.** It loads **out-of-process**: the plug-in image is not mapped into the harness and an `AUHostingService` process runs it.
+  - Out-of-process it renders (−23.3 dBFS for a −15.1 dBFS sine, about −8 dB at the old defaults) and pulls its input.
+  - Host bypass is bit-exact (residual −151 dB).
+  - `AudioUnitSetParameter` changes are audible, and all 15 presets are audible.
+  - So the old plug-in itself works out-of-process. Candidate 1 is ruled out for the old build's render path.
+  - Under `arch -x86_64` the component is **not even registered** (arm64-only build), which confirms B2.
+- **B, A plus a Safari-style quarantine flag on every file.** It still loads and renders on the runner. **CI does not reproduce the Gatekeeper rejection** seen on the user's macOS 27 Mac with a Chrome download. CI can therefore only prove that the installer removes the flag and that everything works afterwards; the proof of the fix is the user's Mac.
+- **C, the linker-signed artifact.** It registers and renders on the runner as well.
+- **D, A with `sandboxSafe` patched in.** The registry reports `flags=0x2 sandboxSafe=1`, and an explicit out-of-process request still runs out-of-process.
+- **Harness bugs found by this run.**
+  - JUCE publishes continuous AU parameters *normalised* (`minValue 0`, `maxValue 1`), so "Output = 0.0" meant −24 dB; the harness now uses `kAudioUnitProperty_ParameterValueFromString`.
+  - Reading ClassInfo immediately after an out-of-process `SetParameter` once missed the last change (`Drift`); the harness now lets changes settle first.
+  - Annotations are cut at about 4 KB, so the in-process, editor and `AUAudioUnit` sections of this run were lost; logs are now condensed and chunked.
+
 **Unrelated findings in the same report:**
 - *GarageBand crashed at launch four times* (00:05:56–00:06:20): dyld `Symbol not found: _BNNSGraphContextGetArgPosition` in GarageBand's own `MAMachineLearning.framework` against the system Accelerate framework. This is a GarageBand/macOS version mismatch, not VEIL; GarageBand later launched normally.
 - *The Standalone `VEIL.app` from the artifact was blocked the same way*: AMFI `no CMS blob`, `Security policy would not allow process`. It had only a linker signature, because CI re-signed the AU alone.
