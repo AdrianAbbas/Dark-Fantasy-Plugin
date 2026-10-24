@@ -1,0 +1,149 @@
+VEIL — Linux VST3 host validation
+
+Validator: official Tracktion/pluginval v1.0.4 Linux release (JUCE 8.0.3).
+Source: https://github.com/Tracktion/pluginval/releases/tag/v1.0.4
+Download: https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_Linux.zip
+Download used normal HTTPS certificate verification. Upstream release published
+no separate checksum asset; local ZIP SHA-256:
+c01c49d8063965c4c2dea8324468336768f5c9139e0b1caebde14c2400b55352
+
+Environment: Debian 13 x86_64, GCC 14.2, rootless dependencies under
+/workspace/toolchain. Xvfb provides the virtual display.
+
+Exact command (exit 0):
+source /workspace/toolchain/activate.sh
+XDG_CACHE_HOME=/workspace/toolchain/cache xvfb-run -a /workspace/toolchain/pluginval/pluginval --validate /workspace/Dark-Fantasy-Plugin/build/VEIL_artefacts/Release/VST3/VEIL.vst3 --strictness-level 5 --sample-rates 44100,48000,88200,96000 --block-sizes 64,256,1024 --random-seed 9384 --output-dir /workspace/toolchain/pluginval/results --output-filename veil-level5-final.txt
+
+Outcome: SUCCESS. Includes editor creation/destruction, editor automation,
+program enumeration, state restoration, audio processing, parameter automation,
+and bus lifecycle checks. Four sample rates, three buffer sizes; automation uses
+32-sample sub-blocks. The independent Steinberg VST3 validator was not supplied.
+AU validation is unavailable on Linux: pluginval's auval line is not an AU test.
+
+Standalone smoke command:
+XDG_CACHE_HOME=/workspace/toolchain/cache xvfb-run -a timeout 5s /workspace/Dark-Fantasy-Plugin/build/VEIL_artefacts/Release/Standalone/VEIL
+Outcome: exit 124 as expected (application remained alive until timeout).
+No physical audio playback was tested. ALSA reported absent /dev/snd/seq.
+Both final binaries resolve all shared libraries with LD_LIBRARY_PATH cleared
+using the machine's system runtime libraries (ldd: no missing dependencies).
+
+Validation completed UTC: 2026-10-24T02:42:17.642008+00:00
+Artifact SHA-256 build/VEIL_artefacts/Release/VST3/VEIL.vst3/Contents/x86_64-linux/VEIL.so:
+207ebbec46927d921bd978c35bed807dc4c7700de4b6e120b106fc2ce758e986
+Artifact SHA-256 build/VEIL_artefacts/Release/Standalone/VEIL:
+d7d587f4dc484db2cb3d2ca1533c09af3f54ea333a776d1727cb9e2c9d68549b
+
+Validator output follows:
+
+Started validating: /workspace/Dark-Fantasy-Plugin/build/VEIL_artefacts/Release/VST3/VEIL.vst3
+Random seed: 0x24a8
+Validation started
+Strictness level: 5
+-----------------------------------------------------------------
+Starting tests in: pluginval / Scan for plugins located in: /workspace/Dark-Fantasy-Plugin/build/VEIL_artefacts/Release/VST3/VEIL.vst3...
+Num plugins found: 1
+
+Testing plugin: VST3-VEIL-e25c249c-1b1541cf
+Veil Audio: VEIL v1.0.0
+Completed tests in pluginval / Scan for plugins located in: /workspace/Dark-Fantasy-Plugin/build/VEIL_artefacts/Release/VST3/VEIL.vst3
+-----------------------------------------------------------------
+Starting tests in: pluginval / Open plugin (cold)...
+Completed tests in pluginval / Open plugin (cold)
+-----------------------------------------------------------------
+Starting tests in: pluginval / Open plugin (warm)...
+Running tests 1 times
+Completed tests in pluginval / Open plugin (warm)
+-----------------------------------------------------------------
+Starting tests in: pluginval / Plugin info...
+
+Plugin name: VEIL
+Alternative names: VEIL
+SupportsDoublePrecision: no
+Reported latency: 0
+Reported taillength: 60
+Completed tests in pluginval / Plugin info
+-----------------------------------------------------------------
+Starting tests in: pluginval / Plugin programs...
+Num programs: 15
+All program names checked
+
+Changing program
+Completed tests in pluginval / Plugin programs
+-----------------------------------------------------------------
+Starting tests in: pluginval / Editor...
+Completed tests in pluginval / Editor
+-----------------------------------------------------------------
+Starting tests in: pluginval / Open editor whilst processing...
+Completed tests in pluginval / Open editor whilst processing
+-----------------------------------------------------------------
+Starting tests in: pluginval / Audio processing...
+Testing with sample rate [44100] and block size [64]
+Testing with sample rate [44100] and block size [256]
+Testing with sample rate [44100] and block size [1024]
+Testing with sample rate [48000] and block size [64]
+Testing with sample rate [48000] and block size [256]
+Testing with sample rate [48000] and block size [1024]
+Testing with sample rate [88200] and block size [64]
+Testing with sample rate [88200] and block size [256]
+Testing with sample rate [88200] and block size [1024]
+Testing with sample rate [96000] and block size [64]
+Testing with sample rate [96000] and block size [256]
+Testing with sample rate [96000] and block size [1024]
+Completed tests in pluginval / Audio processing
+-----------------------------------------------------------------
+Starting tests in: pluginval / Plugin state...
+Completed tests in pluginval / Plugin state
+-----------------------------------------------------------------
+Starting tests in: pluginval / Automation...
+Testing with sample rate [44100] and block size [64] and sub-block size [32]
+Testing with sample rate [44100] and block size [256] and sub-block size [32]
+Testing with sample rate [44100] and block size [1024] and sub-block size [32]
+Testing with sample rate [48000] and block size [64] and sub-block size [32]
+Testing with sample rate [48000] and block size [256] and sub-block size [32]
+Testing with sample rate [48000] and block size [1024] and sub-block size [32]
+Testing with sample rate [88200] and block size [64] and sub-block size [32]
+Testing with sample rate [88200] and block size [256] and sub-block size [32]
+Testing with sample rate [88200] and block size [1024] and sub-block size [32]
+Testing with sample rate [96000] and block size [64] and sub-block size [32]
+Testing with sample rate [96000] and block size [256] and sub-block size [32]
+Testing with sample rate [96000] and block size [1024] and sub-block size [32]
+Completed tests in pluginval / Automation
+-----------------------------------------------------------------
+Starting tests in: pluginval / Editor Automation...
+Completed tests in pluginval / Editor Automation
+-----------------------------------------------------------------
+Starting tests in: pluginval / Automatable Parameters...
+Completed tests in pluginval / Automatable Parameters
+-----------------------------------------------------------------
+Starting tests in: pluginval / auval...
+Completed tests in pluginval / auval
+-----------------------------------------------------------------
+Starting tests in: pluginval / vst3 validator...
+INFO: Skipping vst3 validator as validator path hasn't been set
+Completed tests in pluginval / vst3 validator
+-----------------------------------------------------------------
+Starting tests in: pluginval / Basic bus...
+Completed tests in pluginval / Basic bus
+-----------------------------------------------------------------
+Starting tests in: pluginval / Listing available buses...
+Inputs:
+	Named layouts: Mono, Stereo
+	Discrete layouts: Discrete #1
+Outputs:
+	Named layouts: Mono, Stereo
+	Discrete layouts: Discrete #1
+Main bus num input channels: 2
+Main bus num output channels: 2
+Completed tests in pluginval / Listing available buses
+-----------------------------------------------------------------
+Starting tests in: pluginval / Enabling all buses...
+Completed tests in pluginval / Enabling all buses
+-----------------------------------------------------------------
+Starting tests in: pluginval / Disabling non-main busses...
+Completed tests in pluginval / Disabling non-main busses
+-----------------------------------------------------------------
+Starting tests in: pluginval / Restoring default layout...
+Main bus num input channels: 2
+Main bus num output channels: 2
+Completed tests in pluginval / Restoring default layout
+SUCCESS

@@ -1,0 +1,8 @@
+[test] parameters, factory presets, binary state, user presets, A/B
+[test] routing, unity bypass, dry mix, finite input recovery, allocation guard
+[test] sample-rate changes, silence, tones, impulses, extreme feedback, all presets
+[metric] last 96 kHz processing load = 8.29495% of real time (host-dependent, non-gating)
+[test] audible DSP: filter, saturation, reverb characters, reverse, freeze, pitched choir
+[test] Ritual barycentric vertices, projection, smooth bounded motion, bypass
+[test] native editor construction, resize, parameter attachments and destruction
+VEIL regression: 474 passed, 0 failed
