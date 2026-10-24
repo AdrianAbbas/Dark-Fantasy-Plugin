@@ -28,10 +28,12 @@
 #import <CoreAudioKit/CoreAudioKit.h>
 
 #include <mach-o/dyld.h>
+#include <mach/mach_time.h>
 #include <sys/sysctl.h>
 #include <unistd.h>
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstdarg>
 #include <cstddef>
@@ -39,6 +41,7 @@
 #include <cstring>
 #include <string>
 #include <strings.h>
+#include <thread>
 #include <vector>
 
 namespace {
@@ -154,6 +157,29 @@ const char* harnessArchitecture() {
 
 constexpr const char* pluginImageNeedle = "VEIL.component/Contents/MacOS/";
 
+// Out-of-process rendering goes through Apple's render pipe, which expects a host's
+// timing: one block per block-duration with host time set, and playback stopped
+// before the unit is torn down. Rendering flat out from the main thread and
+// uninitialising immediately trapped inside AudioToolbox (caulk::semaphore).
+struct Pacer {
+    bool realTime = false;
+    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+    void begin() { start = std::chrono::steady_clock::now(); }
+    void wait(size_t framesDone, double sampleRate) const {
+        if (realTime)
+            std::this_thread::sleep_until(start + std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+                                                      std::chrono::duration<double>(double(framesDone) / sampleRate)));
+    }
+};
+
+AudioTimeStamp hostTimeStamp(Float64 sampleTime) {
+    AudioTimeStamp ts {};
+    ts.mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid;
+    ts.mSampleTime = sampleTime;
+    ts.mHostTime = mach_absolute_time();
+    return ts;
+}
+
 //==============================================================================
 AudioStreamBasicDescription floatFormat(double sampleRate, UInt32 channels) {
     AudioStreamBasicDescription f {};
@@ -263,6 +289,8 @@ struct V2Host {
     AudioUnit unit = nullptr;
     Report* report = nullptr;   // optional: trace each configuration call
     bool callbackInstalled = false;
+    bool rendered = false;      // render resources in use since the last initialise
+    Pacer pacer;
     Source source;
     double sampleRate = 48000.0;
     UInt32 inChannels = 2, outChannels = 2, maxFrames = 512;
@@ -276,8 +304,10 @@ struct V2Host {
     OSStatus configure(double sr, UInt32 in, UInt32 out, UInt32 frames = 512) {
         sampleRate = sr; inChannels = in; outChannels = out; maxFrames = frames;
         source.sampleRate = sr;
+        if (rendered && pacer.realTime) pump(0.2);   // playback stopped, then reconfigure
         trace("uninitialize");
         AudioUnitUninitialize(unit);
+        rendered = false;
         auto inFormat = floatFormat(sr, in), outFormat = floatFormat(sr, out);
         trace("input format");
         OSStatus s = AudioUnitSetProperty(unit, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &inFormat, sizeof(inFormat));
@@ -311,7 +341,10 @@ struct V2Host {
         std::vector<const float*> channels(outChannels);
         Meter meter;
         size_t done = 0;
+        rendered = true;
+        pacer.begin();
         while (done < total) {
+            pacer.wait(done, sampleRate);
             const auto frames = UInt32(std::min<size_t>(maxFrames, total - done));
             abl->mNumberBuffers = outChannels;
             for (UInt32 c = 0; c < outChannels; ++c) {
@@ -321,9 +354,7 @@ struct V2Host {
                 abl->mBuffers[c].mData = outputs[c].data();
             }
             AudioUnitRenderActionFlags flags = 0;
-            AudioTimeStamp ts {};
-            ts.mFlags = kAudioTimeStampSampleTimeValid;
-            ts.mSampleTime = sampleTime;
+            const AudioTimeStamp ts = hostTimeStamp(sampleTime);
             result.status = AudioUnitRender(unit, &flags, &ts, 0, frames, abl);
             if (result.status != noErr) break;
             for (UInt32 c = 0; c < outChannels; ++c)
@@ -558,6 +589,7 @@ void v2Suite(Report& r, AudioComponent component, bool outOfProcess, bool useWin
 
     V2Host host;
     host.unit = unit;
+    host.pacer.realTime = outOfProcess && !imageAfter;
 
     // 1. Stereo render at 48 kHz.
     s = host.configure(48000.0, 2, 2);
@@ -711,6 +743,7 @@ void v2Suite(Report& r, AudioComponent component, bool outOfProcess, bool useWin
         auto res = host.render(2.0, 1.0);
         r.check(res.status == noErr && toDb(res.outRms[0]) > -40.0 && toDb(res.outRms[1]) > -40.0, "mono 1->2 is audible on both outputs", res.describe());
     }
+    if (host.pacer.realTime) pump(0.2);
     AudioUnitUninitialize(unit);
 
     // 9. Editor.
@@ -755,6 +788,7 @@ void auAudioUnitSuite(Report& r, AudioComponentDescription description, bool use
     unit.maximumFramesToRender = 512;
     e = nil;
     if (!r.check([unit allocateRenderResourcesAndReturnError: &e], "allocateRenderResources", toString(e.description))) return;
+    pump(0.3);
 
     // Buffers live here; blocks capture raw pointers only.
     Source source;
@@ -798,7 +832,11 @@ void auAudioUnitSuite(Report& r, AudioComponentDescription description, bool use
         std::vector<uint8_t> storage(offsetof(AudioBufferList, mBuffers) + sizeof(AudioBuffer) * 2);
         auto* abl = reinterpret_cast<AudioBufferList*>(storage.data());
         size_t doneFrames = 0;
+        Pacer pacer;
+        pacer.realTime = true;
+        pacer.begin();
         while (doneFrames < total) {
+            pacer.wait(doneFrames, 48000.0);
             const auto frames = UInt32(std::min<size_t>(512, total - doneFrames));
             abl->mNumberBuffers = 2;
             float* outs[2] = { out0.data(), out1.data() };
@@ -808,9 +846,7 @@ void auAudioUnitSuite(Report& r, AudioComponentDescription description, bool use
                 abl->mBuffers[c].mData = hostOutputBuffers ? outs[c] : nullptr;
             }
             AudioUnitRenderActionFlags flags = 0;
-            AudioTimeStamp ts {};
-            ts.mFlags = kAudioTimeStampSampleTimeValid;
-            ts.mSampleTime = sampleTime;
+            const AudioTimeStamp ts = hostTimeStamp(sampleTime);
             result.status = renderBlock(&flags, &ts, frames, 0, abl, pull);
             if (result.status == noErr && (abl->mBuffers[0].mData == nullptr || abl->mBuffers[1].mData == nullptr)) {
                 result.status = kAudioUnitErr_FailedInitialization;   // unit left an output buffer unset
@@ -881,6 +917,7 @@ void auAudioUnitSuite(Report& r, AudioComponentDescription description, bool use
 
     NSDictionary<NSString*, id>* state = unit.fullState;
     r.check(state != nil, "fullState readable", strf("%lu keys", (unsigned long) state.count));
+    pump(0.2);
     [unit deallocateRenderResources];
 
     if (useWindow) {
