@@ -110,7 +110,33 @@ Info.plist otherwise checked out: type/subtype/manufacturer `aufx`/`Vel1`/`Veil`
 - `build.yml` builds and runs the harness after `auval`, report-only. It becomes `--strict` (failing the build) in Milestone 1.
 - `scripts/diagnose-mac.sh`: read-only report from the user's Mac. It covers installed copies, quarantine, signatures, registry entries, which process has VEIL loaded, crash reports and system log lines, plus five questions only the user can answer.
 
-**Gate status.** The top candidates are documented with evidence. The bug has not been reproduced or ruled out by a test, because that needs either push access (to run the harness on macOS CI) or the user's diagnostics report.
+**Gate status (first pass).** The top candidates were documented with evidence. The bug had not yet been reproduced or ruled out by a test, because that needed either push access (to run the harness on macOS CI) or the user's diagnostics report.
+
+### Root cause: confirmed from the user's Mac
+
+The user ran `scripts/diagnose-mac.sh` on their Mac (Apple M3, macOS 27.0.1, GarageBand 10.4.14, Gatekeeper assessments enabled, no Rosetta). The installed `VEIL.component` is **byte-identical to the green-run artifact** (binary sha256 `772d7d09…c179b7`, the build CI validated with `auval`). So the build itself was fine. macOS refused to run the downloaded copy.
+
+The chain, from the report's system log:
+
+1. The installed bundle and every file in it carry `com.apple.quarantine: 0081;…;Chrome;…` from the browser download. `spctl --assess` says `rejected`.
+2. GarageBand asks for VEIL; CoreAudio hosts it **out-of-process** in `AUHostingServiceXPC_arrow`.
+3. AMFI: `VEIL is adhoc signed` → amfid `-423 The file is adhoc signed or signed by an unknown certificate chain`.
+4. syspolicyd: `GK evaluateScanResult: 1 … Prompt shown (6, 0)`, then `Adding Gatekeeper denial breadcrumb (direct)`. The "cannot be verified" prompt appeared and was not approved.
+5. Kernel: `ASP: Library load (…AUHostingServiceXPC_arrow -> …/VEIL.component/Contents/MacOS/VEIL) rejected: library load disallowed by system policy`. dlopen fails: `code signature … not valid for use in process: library load disallowed by system policy`.
+6. GarageBand: `APComponent.mm:354 error -1 returned from OpenAsync for aufx/Vel1/Veil`. The insert has no running instance, which explains the silence, the missing editor and inert controls. The repeated attempts at 00:08 and 01:14 fail identically.
+7. On the same Mac, `auval -a` now prints `Cannot open component: -1` and `auval -v` fails with `OpenAComponent: result: -1` (`auvaltool` load rejected by the same policy). CI's `auval` passed only because the CI runner's copy was never quarantined.
+
+**Root cause:** a quarantined, ad-hoc-signed (not notarised) bundle is rejected by Gatekeeper/AppleSystemPolicy at load time. Nothing in the old release removed quarantine, and nothing tested a downloaded copy. Candidate 2 above is confirmed; candidate 1's out-of-process path is confirmed as GarageBand's actual route. Whether VEIL works correctly out-of-process *once loadable* is still to be shown by the harness.
+
+**Fix.**
+- `install-mac.sh` removes quarantine, re-signs ad-hoc, verifies, resets the AU registrar, then runs `auval`.
+- CI reproduces the user's state: it quarantines the packaged bundle, installs it with that script, then runs `auval` and the strict harness.
+- Proper distribution to other people needs Developer ID signing and notarisation (optional CI path).
+
+**Unrelated findings in the same report:**
+- *GarageBand crashed at launch four times* (00:05:56–00:06:20): dyld `Symbol not found: _BNNSGraphContextGetArgPosition` in GarageBand's own `MAMachineLearning.framework` against the system Accelerate framework. This is a GarageBand/macOS version mismatch, not VEIL; GarageBand later launched normally.
+- *The Standalone `VEIL.app` from the artifact was blocked the same way*: AMFI `no CMS blob`, `Security policy would not allow process`. It had only a linker signature, because CI re-signed the AU alone.
+- *`lipo` failed in the diagnostics script* because it is an Xcode shim that requires accepting the Xcode licence. The script now uses `file`.
 
 ### Plan for Milestone 1 (after the gate)
 
@@ -132,7 +158,8 @@ Info.plist otherwise checked out: type/subtype/manufacturer `aufx`/`Vel1`/`Veil`
 | B1 | AU not marked sandbox-safe, so GarageBand hosts it out-of-process | confirmed (plist) | E1 | Milestone 1 |
 | B2 | arm64-only binary; Intel Macs and Rosetta hosts cannot load it in-process | confirmed | E2 | Milestone 1 |
 | B3 | CI published installable bundles from failed runs, including one with an unsealed linker signature | confirmed | E3 | Milestone 1 |
-| B4 | No install path: quarantine never removed, AU registrar never reset, duplicates never detected | confirmed | E8 | Milestone 1 |
+| B4 | No install path: quarantine never removed, AU registrar never reset, duplicates never detected. **This is the GarageBand failure** (see B7) | confirmed on the user's Mac | E8; user report | Milestone 1 |
 | B5 | No mono→stereo layout | confirmed (`auval`) | E4 | Milestone 1 |
 | B6 | AU editor and out-of-process hosting never exercised by any test | confirmed | E4 | harness added; enforced in Milestone 1 |
-| B7 | Root cause of the GarageBand silence and generic UI | **open** | candidates 1–7 above | pending harness run and user diagnostics |
+| B7 | GarageBand silence and generic UI: Gatekeeper rejects the quarantined ad-hoc-signed bundle, so `AUHostingServiceXPC_arrow` cannot load it and GarageBand's `OpenAsync` returns −1 | **confirmed** on the user's Mac | "Root cause" above | Milestone 1: install script + quarantined-install CI test |
+| B8 | CI signed only the AU; the Standalone `VEIL.app` in the artifact kept a linker-only signature and was blocked on the user's Mac | confirmed on the user's Mac | user report | Milestone 1: sign every bundle; Standalone no longer shipped |

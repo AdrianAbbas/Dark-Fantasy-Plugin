@@ -31,9 +31,10 @@ section "Hosts"
 for app in "/Applications/GarageBand.app" "/Applications/Logic Pro.app" "/Applications/Logic Pro X.app"; do
     [[ -d "$app" ]] || continue
     exe="$app/Contents/MacOS/$(/usr/bin/defaults read "$app/Contents/Info" CFBundleExecutable 2>/dev/null)"
-    printf '%s  version %s  binary archs: %s\n' "$app" \
+    # `file`, not `lipo`: lipo is an Xcode shim that fails until the Xcode licence is accepted.
+    printf '%s  version %s\n  %s\n' "$app" \
         "$(/usr/bin/defaults read "$app/Contents/Info" CFBundleShortVersionString 2>/dev/null)" \
-        "$(/usr/bin/lipo -archs "$exe" 2>/dev/null)"
+        "$(/usr/bin/file "$exe" 2>/dev/null)"
 done
 echo "Running host / plug-in hosting processes (pid, name):"
 /usr/bin/pgrep -l -i -f 'GarageBand|Logic Pro|AUHostingService' 2>/dev/null || echo "  none running"
@@ -70,7 +71,6 @@ for bundle in "${components[@]}"; do
     section "Bundle: $bundle"
     binary="$bundle/Contents/MacOS/VEIL"
     run /usr/bin/file "$binary"
-    run /usr/bin/lipo -archs "$binary"
     run /usr/bin/shasum -a 256 "$binary"
     run /usr/libexec/PlistBuddy -c 'Print :AudioComponents' "$bundle/Contents/Info.plist"
     echo "Extended attributes (com.apple.quarantine means macOS treats it as downloaded):"
