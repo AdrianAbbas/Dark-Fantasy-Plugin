@@ -19,7 +19,7 @@ fi
     /usr/libexec/PlistBuddy -c Print "$veil_plist"
 } > "$veil_logs/bundle-info.txt" 2>&1
 cat "$veil_logs/bundle-info.txt"
-/usr/bin/lipo -verify_arch arm64 "$veil_binary"
+/usr/bin/lipo "$veil_binary" -verify_arch arm64
 for veil_pair in 'type aufx' 'subtype Vel1' 'manufacturer Veil' 'factoryFunction VEILAUFactory'; do
     read -r veil_key veil_expected <<< "$veil_pair"
     veil_actual=$(/usr/libexec/PlistBuddy -c "Print :AudioComponents:0:$veil_key" "$veil_plist")

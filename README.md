@@ -37,7 +37,7 @@ GitHub Actions uploads **VEIL-macOS-arm64-unsigned** even when validation fails.
 
 Quit Logic before installing. Launch Logic, open **Logic Pro > Settings > Plug-in Manager**, find **Veil Audio / VEIL**, and use **Reset & Rescan Selection** if needed. Insert VEIL in an **Audio FX** slot after the instrument on a software instrument channel strip, or on an audio track. It is not an instrument and requires incoming audio. Verify automation, mono/stereo instances, bypass and session reopening in Logic. Developer-local builds are not notarized distribution releases; commercial delivery needs your own Apple signing identity, hardened-runtime packaging where applicable, notarization and installer testing.
 
-**This project was developed and built on Linux. No macOS AU artifact, Apple Silicon execution, auval result, code signing or Logic Pro validation is claimed.** The CMake AU target and commands above are provided for that required Mac verification.
+The Native build workflow builds all three macOS formats for Apple Silicon and runs Apple's full `auval` validation. Check the macOS job for the commit you download; artifacts are retained even after a failure. The bundles use local ad-hoc signing, not Developer ID signing/notarization. Logic Pro hosting and session-reopening checks still need your Mac.
 
 ### Linux development
 

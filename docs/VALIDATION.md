@@ -28,8 +28,18 @@ pluginval's `auval` section on Linux does **not** execute Apple's validator. Its
 
 ## Remaining target-platform validation
 
-**Not run:** macOS compilation, AUv2 artifact generation, Apple Silicon/Intel runtime checks, Apple's `auval`, Logic Pro scan/automation/session reopening, code signing, notarization, physical audio hardware, and musician listening evaluation. A macOS build/auval CI workflow is supplied but has not been run by this cloud task. README provides exact build and installation instructions.
+**macOS update:** Apple Silicon AU/VST3/Standalone builds and regression tests have executed on macOS 14.8.9. The existing arm64 AU passed Apple's complete `auval` in diagnostic run [40059936712](https://github.com/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40059936712), with `AU VALIDATION SUCCEEDED` and exit 0. The Native build workflow independently rebuilds and validates the current commit; check its result before using an artifact.
+
+**Not run:** Intel macOS execution, Logic Pro scan/automation/session reopening, Developer ID signing/notarization, physical audio hardware, and musician listening evaluation. README provides build and installation instructions.
 
 The delivered Linux VST3/Standalone artifacts are Linux binaries and cannot be installed into Logic Pro. They depend on a compatible modern Linux runtime (cloud build: glibc 2.41), rather than being a universal distribution package.
 
 The Wraith/Choir/reverse wet paths deliberately add delay and texture. The direct path is immediate and host latency is reported as 0 samples. Pitch/granular artifacts, approximate 2× saturation anti-aliasing, non-serialized frozen audio and tempo-following rather than transport-locked motion are documented first-version tradeoffs.
+
+## AU discovery failure and repair
+
+Original run [40056101232](https://github.com/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40056101232) built successfully, but `auval -v aufx Vel1 Veil` exited 2 with `Cannot get Component's Name strings`, component-version error `-50`, and `FATAL ERROR: didn't find the component`. This failed before plugin instantiation. The identifiers and native arm64 architecture were correct.
+
+Testing the original built AU on macOS confirmed its bundle signature failed verification: `code has no resources but signature indicates they must be present`. The linker signature had no valid bundle resource envelope. Complete-bundle ad-hoc signing and verification fixed that prerequisite. Refreshing the current user's AudioComponentRegistrar and waiting for the exact `aufx Vel1 Veil` inventory entry then made the plugin discoverable. Full parameter, channel-format and rendering validation passed without any DSP changes.
+
+`scripts/validate-au-macos.sh` performs these checks and returns Apple's actual validator exit status. Native workflow packaging and uploads use `always()`, so failures stay red while the component and diagnostic logs remain available. Inner `ditto` ZIPs preserve executable permissions and bundle metadata.
