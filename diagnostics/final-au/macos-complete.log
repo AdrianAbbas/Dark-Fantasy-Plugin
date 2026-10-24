@@ -1,0 +1,1122 @@
+﻿2026-10-24T03:52:14.6099280Z Current runner version: '2.338.0'
+2026-10-24T03:52:14.6123830Z ##[group]Runner Image Provisioner
+2026-10-24T03:52:14.6124430Z Hosted Compute Agent
+2026-10-24T03:52:14.6124800Z Version: 20260828.587
+2026-10-24T03:52:14.6125210Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+2026-10-24T03:52:14.6125670Z Build Date: 2026-08-28T16:44:25Z
+2026-10-24T03:52:14.6126120Z Worker ID: {f2b6adf1-28c3-44da-a9eb-038b05539cbe}
+2026-10-24T03:52:14.6126570Z Azure Region: westus
+2026-10-24T03:52:14.6126930Z ##[endgroup]
+2026-10-24T03:52:14.6127800Z ##[group]Operating System
+2026-10-24T03:52:14.6128200Z macOS
+2026-10-24T03:52:14.6128510Z 14.8.9
+2026-10-24T03:52:14.6128840Z 23J631
+2026-10-24T03:52:14.6129170Z ##[endgroup]
+2026-10-24T03:52:14.6129540Z ##[group]Runner Image
+2026-10-24T03:52:14.6129920Z Image: macos-14-arm64
+2026-10-24T03:52:14.6130320Z Version: 20260831.0302.1
+2026-10-24T03:52:14.6131240Z Included Software: https://github.com/actions/runner-images/blob/macos-14-arm64/20260831.0302/images/macos/macos-14-arm64-Readme.md
+2026-10-24T03:52:14.6132270Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-14-arm64%2F20260831.0302
+2026-10-24T03:52:14.6132920Z ##[endgroup]
+2026-10-24T03:52:14.6133710Z ##[group]GITHUB_TOKEN Permissions
+2026-10-24T03:52:14.6135170Z Contents: read
+2026-10-24T03:52:14.6135540Z Metadata: read
+2026-10-24T03:52:14.6135900Z ##[endgroup]
+2026-10-24T03:52:14.6137420Z Secret source: Actions
+2026-10-24T03:52:14.6138010Z Cache mode: write
+2026-10-24T03:52:14.6138480Z Prepare workflow directory
+2026-10-24T03:52:14.6438390Z Prepare all required actions
+2026-10-24T03:52:14.6477880Z Getting action download info
+2026-10-24T03:52:14.7988470Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-24T03:52:15.1540290Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-24T03:52:15.3948150Z Complete job name: macos
+2026-10-24T03:52:15.4536830Z ##[group]Run actions/checkout@v4
+2026-10-24T03:52:15.4537670Z with:
+2026-10-24T03:52:15.4538050Z   repository: AdrianAbbas/Dark-Fantasy-Plugin
+2026-10-24T03:52:15.4541050Z   token: ***
+2026-10-24T03:52:15.4541360Z   ssh-strict: true
+2026-10-24T03:52:15.4541690Z   ssh-user: git
+2026-10-24T03:52:15.4542020Z   persist-credentials: true
+2026-10-24T03:52:15.4542380Z   clean: true
+2026-10-24T03:52:15.4542720Z   sparse-checkout-cone-mode: true
+2026-10-24T03:52:15.4543100Z   fetch-depth: 1
+2026-10-24T03:52:15.4543420Z   fetch-tags: false
+2026-10-24T03:52:15.4543750Z   show-progress: true
+2026-10-24T03:52:15.4544080Z   lfs: false
+2026-10-24T03:52:15.4544380Z   submodules: false
+2026-10-24T03:52:15.4544720Z   set-safe-directory: true
+2026-10-24T03:52:15.4545100Z   allow-unsafe-pr-checkout: false
+2026-10-24T03:52:15.4545600Z ##[endgroup]
+2026-10-24T03:52:15.6831770Z Syncing repository: AdrianAbbas/Dark-Fantasy-Plugin
+2026-10-24T03:52:15.6833950Z ##[group]Getting Git version info
+2026-10-24T03:52:15.6835850Z Working directory is '/Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin'
+2026-10-24T03:52:15.6837030Z [command]/opt/homebrew/bin/git version
+2026-10-24T03:52:15.7032460Z git version 2.55.0
+2026-10-24T03:52:15.7064880Z ##[endgroup]
+2026-10-24T03:52:15.7071990Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/08bb9c11-6648-4a72-8a38-f0f0d5a77836/.gitconfig'
+2026-10-24T03:52:15.7073580Z Temporarily overriding HOME='/Users/runner/work/_temp/08bb9c11-6648-4a72-8a38-f0f0d5a77836' before making global git config changes
+2026-10-24T03:52:15.7075100Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-24T03:52:15.7079310Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin
+2026-10-24T03:52:15.7186960Z Deleting the contents of '/Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin'
+2026-10-24T03:52:15.7192300Z ##[group]Initializing the repository
+2026-10-24T03:52:15.7215040Z [command]/opt/homebrew/bin/git init /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin
+2026-10-24T03:52:15.7469250Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-24T03:52:15.7470230Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-24T03:52:15.7470950Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-24T03:52:15.7471490Z hint: call:
+2026-10-24T03:52:15.7471800Z hint:
+2026-10-24T03:52:15.7472170Z hint: 	git config --global init.defaultBranch <name>
+2026-10-24T03:52:15.7472620Z hint:
+2026-10-24T03:52:15.7473050Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-24T03:52:15.7473710Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-24T03:52:15.7474230Z hint:
+2026-10-24T03:52:15.7474570Z hint: 	git branch -m <name>
+2026-10-24T03:52:15.7474920Z hint:
+2026-10-24T03:52:15.7475410Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-24T03:52:15.7476260Z Initialized empty Git repository in /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/.git/
+2026-10-24T03:52:15.7482580Z [command]/opt/homebrew/bin/git remote add origin https://github.com/AdrianAbbas/Dark-Fantasy-Plugin
+2026-10-24T03:52:15.7555690Z ##[endgroup]
+2026-10-24T03:52:15.7556520Z ##[group]Disabling automatic garbage collection
+2026-10-24T03:52:15.7561050Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-24T03:52:15.7618360Z ##[endgroup]
+2026-10-24T03:52:15.7619990Z ##[group]Setting up auth
+2026-10-24T03:52:15.7622470Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-24T03:52:15.7682450Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-24T03:52:15.8467790Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-24T03:52:15.8516970Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-24T03:52:15.9234900Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-24T03:52:15.9281110Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-24T03:52:15.9977950Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-24T03:52:16.0038920Z ##[endgroup]
+2026-10-24T03:52:16.0040540Z ##[group]Fetching the repository
+2026-10-24T03:52:16.0049050Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +05cc9e5e8b9d74647338fbdad86c5014f36473b2:refs/remotes/origin/main
+2026-10-24T03:52:16.6907910Z From https://github.com/AdrianAbbas/Dark-Fantasy-Plugin
+2026-10-24T03:52:16.6911360Z  * [new ref]         05cc9e5e8b9d74647338fbdad86c5014f36473b2 -> origin/main
+2026-10-24T03:52:16.6928800Z ##[endgroup]
+2026-10-24T03:52:16.6932040Z ##[group]Determining the checkout info
+2026-10-24T03:52:16.6935210Z ##[endgroup]
+2026-10-24T03:52:16.6937690Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-24T03:52:16.7064880Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-24T03:52:16.7110990Z ##[group]Checking out the ref
+2026-10-24T03:52:16.7113000Z [command]/opt/homebrew/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-10-24T03:52:16.7263470Z Switched to a new branch 'main'
+2026-10-24T03:52:16.7264530Z branch 'main' set up to track 'origin/main'.
+2026-10-24T03:52:16.7271980Z ##[endgroup]
+2026-10-24T03:52:16.7339140Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-24T03:52:16.7384410Z 05cc9e5e8b9d74647338fbdad86c5014f36473b2
+2026-10-24T03:52:16.7646340Z ##[group]Run cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+2026-10-24T03:52:16.7650030Z [36;1mcmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0[0m
+2026-10-24T03:52:16.7732790Z shell: /bin/bash -e {0}
+2026-10-24T03:52:16.7733240Z ##[endgroup]
+2026-10-24T03:52:18.1738080Z -- The C compiler identification is AppleClang 15.0.0.15000309
+2026-10-24T03:52:19.1910700Z -- The CXX compiler identification is AppleClang 15.0.0.15000309
+2026-10-24T03:52:19.2194120Z -- Detecting C compiler ABI info
+2026-10-24T03:52:19.7682890Z -- Detecting C compiler ABI info - done
+2026-10-24T03:52:19.7807720Z -- Check for working C compiler: /usr/bin/cc - skipped
+2026-10-24T03:52:19.7813240Z -- Detecting C compile features
+2026-10-24T03:52:19.7853460Z -- Detecting C compile features - done
+2026-10-24T03:52:19.7933990Z -- Detecting CXX compiler ABI info
+2026-10-24T03:52:19.9299050Z -- Detecting CXX compiler ABI info - done
+2026-10-24T03:52:19.9429910Z -- Check for working CXX compiler: /usr/bin/c++ - skipped
+2026-10-24T03:52:19.9431260Z -- Detecting CXX compile features
+2026-10-24T03:52:19.9435230Z -- Detecting CXX compile features - done
+2026-10-24T03:52:47.5382420Z -- Configuring juceaide
+2026-10-24T03:52:48.5237900Z -- Building juceaide
+2026-10-24T03:53:42.7422420Z -- Exporting juceaide
+2026-10-24T03:53:42.7428740Z -- Testing juceaide
+2026-10-24T03:53:42.9302070Z -- Finished setting up juceaide
+2026-10-24T03:53:43.8668790Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+2026-10-24T03:53:44.2067480Z -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+2026-10-24T03:53:44.2087030Z -- Found Threads: TRUE
+2026-10-24T03:53:44.4087040Z -- Configuring done (87.5s)
+2026-10-24T03:53:44.4906220Z -- Generating done (0.1s)
+2026-10-24T03:53:44.4909810Z -- Build files have been written to: /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build
+2026-10-24T03:53:44.5104930Z ##[group]Run cmake --build build --parallel 3
+2026-10-24T03:53:44.5105500Z [36;1mcmake --build build --parallel 3[0m
+2026-10-24T03:53:44.5824060Z shell: /bin/bash -e {0}
+2026-10-24T03:53:44.5824810Z ##[endgroup]
+2026-10-24T03:53:44.9303600Z [  1%] Building CXX object CMakeFiles/VEIL.dir/Source/PluginProcessor.cpp.o
+2026-10-24T03:53:44.9306630Z [  2%] Building CXX object CMakeFiles/VEIL.dir/Source/PluginEditor.cpp.o
+2026-10-24T03:53:44.9315190Z [  3%] Building CXX object CMakeFiles/juce_vst3_helper.dir/_deps/juce-src/modules/juce_audio_plugin_client/VST3/juce_VST3ManifestHelper.mm.o
+2026-10-24T03:53:48.5892500Z [  4%] Building CXX object CMakeFiles/VEIL.dir/Source/RitualEngine.cpp.o
+2026-10-24T03:53:49.0621090Z [  5%] Building CXX object CMakeFiles/VEIL.dir/Source/PresetManager.cpp.o
+2026-10-24T03:53:49.2773170Z [  6%] Building CXX object CMakeFiles/VEIL.dir/Source/DSP/BasicModules.cpp.o
+2026-10-24T03:53:49.5990350Z [  8%] Building CXX object CMakeFiles/VEIL.dir/Source/DSP/SpatialModules.cpp.o
+2026-10-24T03:53:50.0687680Z [  9%] Building CXX object CMakeFiles/VEIL.dir/Source/UI/VeilLookAndFeel.cpp.o
+2026-10-24T03:53:50.6306520Z [ 10%] Building CXX object CMakeFiles/VEIL.dir/Source/UI/ParameterControls.cpp.o
+2026-10-24T03:53:50.7509910Z [ 11%] Linking CXX executable juce_vst3_helper
+2026-10-24T03:53:51.2125080Z [ 11%] Built target juce_vst3_helper
+2026-10-24T03:53:51.2484450Z [ 12%] Building CXX object CMakeFiles/VEIL.dir/Source/UI/RitualSigil.cpp.o
+2026-10-24T03:53:52.8797990Z [ 13%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o
+2026-10-24T03:53:52.9513690Z [ 14%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o
+2026-10-24T03:53:53.0156480Z [ 16%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_audio_processors/juce_audio_processors.mm.o
+2026-10-24T03:53:54.1661040Z [ 17%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_gui_extra/juce_gui_extra.mm.o
+2026-10-24T03:53:54.3304020Z [ 18%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_gui_basics/juce_gui_basics.mm.o
+2026-10-24T03:53:56.8046360Z In file included from /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build/_deps/juce-src/modules/juce_gui_basics/juce_gui_basics.mm:35:
+2026-10-24T03:53:56.8150230Z /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build/_deps/juce-src/modules/juce_gui_basics/juce_gui_basics.cpp:61:2: warning: This version of JUCE does not use the splash screen, the flag JUCE_DISPLAY_SPLASH_SCREEN is ignored [-W#pragma-messages]
+2026-10-24T03:53:56.8264570Z  JUCE_COMPILER_WARNING ("This version of JUCE does not use the splash screen, the flag JUCE_DISPLAY_SPLASH_SCREEN is ignored")
+2026-10-24T03:53:56.8367640Z  ^
+2026-10-24T03:53:56.8472030Z /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build/_deps/juce-src/modules/juce_core/system/juce_PlatformDefs.h:286:38: note: expanded from macro 'JUCE_COMPILER_WARNING'
+2026-10-24T03:53:56.8574850Z  #define JUCE_COMPILER_WARNING(msg)  _Pragma (JUCE_STRINGIFY (message (msg)))
+2026-10-24T03:53:56.8676330Z                                      ^
+2026-10-24T03:53:56.8779330Z <scratch space>:357:2: note: expanded from here
+2026-10-24T03:53:56.8889360Z  message ("This version of JUCE does not use the splash screen, the flag JUCE_DISPLAY_SPLASH_SCREEN is ignored")
+2026-10-24T03:53:56.8991430Z  ^
+2026-10-24T03:54:02.9511800Z [ 19%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o
+2026-10-24T03:54:06.4824910Z [ 20%] Building C object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_graphics/juce_graphics_Sheenbidi.c.o
+2026-10-24T03:54:07.1280440Z [ 21%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_graphics/juce_graphics.mm.o
+2026-10-24T03:54:28.5422730Z [ 22%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_events/juce_events.mm.o
+2026-10-24T03:54:31.3198730Z [ 24%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_core/juce_core_CompilationTime.cpp.o
+2026-10-24T03:54:31.4142790Z [ 25%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_core/juce_core.mm.o
+2026-10-24T03:54:33.0797280Z [ 26%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_data_structures/juce_data_structures.mm.o
+2026-10-24T03:54:35.7975040Z [ 27%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_audio_basics/juce_audio_basics.mm.o
+2026-10-24T03:54:37.0605460Z 1 warning generated.
+2026-10-24T03:54:37.1166520Z [ 28%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_audio_utils/juce_audio_utils.mm.o
+2026-10-24T03:54:42.6970510Z [ 29%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_audio_formats/juce_audio_formats.mm.o
+2026-10-24T03:54:43.6723830Z [ 31%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_audio_devices/juce_audio_devices.mm.o
+2026-10-24T03:54:47.5234080Z [ 32%] Building CXX object CMakeFiles/VEIL.dir/_deps/juce-src/modules/juce_dsp/juce_dsp.mm.o
+2026-10-24T03:54:55.4360060Z [ 33%] Linking CXX static library VEIL_artefacts/Release/libVEIL_SharedCode.a
+2026-10-24T03:54:57.6966990Z [ 33%] Built target VEIL
+2026-10-24T03:54:57.7178790Z [ 34%] Generating VEIL_artefacts/JuceLibraryCode/VEIL_Standalone/PkgInfo
+2026-10-24T03:54:57.7214760Z [ 35%] Generating VEIL_artefacts/JuceLibraryCode/VEIL_AU/PkgInfo
+2026-10-24T03:54:57.7234920Z [ 36%] Generating VEIL_artefacts/JuceLibraryCode/VEIL_VST3/PkgInfo
+2026-10-24T03:54:57.9318480Z [ 37%] Building CXX object CMakeFiles/VEIL_AU.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o
+2026-10-24T03:54:57.9326200Z [ 39%] Building CXX object CMakeFiles/VEIL_Standalone.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o
+2026-10-24T03:54:57.9338850Z [ 40%] Building CXX object CMakeFiles/VEIL_VST3.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX_utils.cpp.o
+2026-10-24T03:54:57.9952470Z [ 41%] Building CXX object CMakeFiles/VEIL_VST3.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o
+2026-10-24T03:54:57.9953530Z [ 42%] Building CXX object CMakeFiles/VEIL_AU.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o
+2026-10-24T03:54:57.9979950Z [ 43%] Building CXX object CMakeFiles/VEIL_Standalone.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_ARA.cpp.o
+2026-10-24T03:54:58.0670660Z [ 44%] Building CXX object CMakeFiles/VEIL_Standalone.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o
+2026-10-24T03:54:58.0717480Z [ 45%] Building CXX object CMakeFiles/VEIL_AU.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o
+2026-10-24T03:54:58.0797560Z [ 47%] Building CXX object CMakeFiles/VEIL_VST3.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Standalone.cpp.o
+2026-10-24T03:54:58.1435550Z [ 48%] Building CXX object CMakeFiles/VEIL_AU.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o
+2026-10-24T03:54:58.1538560Z [ 49%] Building CXX object CMakeFiles/VEIL_VST3.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o
+2026-10-24T03:54:58.2110830Z [ 51%] Building CXX object CMakeFiles/VEIL_AU.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o
+2026-10-24T03:54:58.2219280Z [ 51%] Building CXX object CMakeFiles/VEIL_VST3.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o
+2026-10-24T03:54:58.2879770Z [ 54%] Building CXX object CMakeFiles/VEIL_VST3.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o
+2026-10-24T03:54:58.2905500Z [ 54%] Building CXX object CMakeFiles/VEIL_AU.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o
+2026-10-24T03:54:58.3600810Z [ 55%] Building CXX object CMakeFiles/VEIL_VST3.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o
+2026-10-24T03:54:58.4390110Z [ 56%] Building CXX object CMakeFiles/VEIL_VST3.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o
+2026-10-24T03:54:58.5567200Z [ 57%] Building CXX object CMakeFiles/VEIL_VST3.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o
+2026-10-24T03:54:58.6517230Z [ 58%] Building CXX object CMakeFiles/VEIL_VST3.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o
+2026-10-24T03:54:58.7483820Z [ 59%] Building CXX object CMakeFiles/VEIL_VST3.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o
+2026-10-24T03:55:02.2589460Z [ 60%] Building CXX object CMakeFiles/VEIL_Standalone.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_Unity.cpp.o
+2026-10-24T03:55:02.4239670Z [ 62%] Building CXX object CMakeFiles/VEIL_Standalone.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AAX.mm.o
+2026-10-24T03:55:02.5859030Z [ 63%] Building CXX object CMakeFiles/VEIL_Standalone.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_1.mm.o
+2026-10-24T03:55:02.7561620Z [ 64%] Building CXX object CMakeFiles/VEIL_Standalone.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o
+2026-10-24T03:55:02.8709400Z [ 65%] Building CXX object CMakeFiles/VEIL_Standalone.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o
+2026-10-24T03:55:03.0170180Z [ 66%] Building CXX object CMakeFiles/VEIL_Standalone.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o
+2026-10-24T03:55:03.0777930Z [ 67%] Building CXX object CMakeFiles/VEIL_Standalone.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o
+2026-10-24T03:55:03.1825670Z [ 68%] Building CXX object CMakeFiles/VEIL_Standalone.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o
+2026-10-24T03:55:03.2834720Z Copying OS X content VEIL_artefacts/Release/Standalone/VEIL.app/Contents/Resources/RecentFilesMenuTemplate.nib
+2026-10-24T03:55:03.3238320Z [ 70%] Linking CXX executable VEIL_artefacts/Release/Standalone/VEIL.app/Contents/MacOS/VEIL
+2026-10-24T03:55:03.9236790Z [ 70%] Built target VEIL_Standalone
+2026-10-24T03:55:03.9439370Z [ 71%] Building CXX object CMakeFiles/VEIL_AU.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AU_2.mm.o
+2026-10-24T03:55:05.2371060Z [ 72%] Building CXX object CMakeFiles/VEIL_AU.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_AUv3.mm.o
+2026-10-24T03:55:05.3686000Z [ 73%] Building CXX object CMakeFiles/VeilTests.dir/Tests/VeilTests.cpp.o
+2026-10-24T03:55:07.3025120Z [ 74%] Building CXX object CMakeFiles/VEIL_AU.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_LV2.mm.o
+2026-10-24T03:55:07.3793010Z [ 75%] Building CXX object CMakeFiles/VEIL_AU.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST2.mm.o
+2026-10-24T03:55:07.4410180Z [ 77%] Building CXX object CMakeFiles/VEIL_AU.dir/_deps/juce-src/modules/juce_audio_plugin_client/juce_audio_plugin_client_VST3.mm.o
+2026-10-24T03:55:07.5135630Z [ 78%] Linking CXX CFBundle shared module VEIL_artefacts/Release/AU/VEIL.component/Contents/MacOS/VEIL
+2026-10-24T03:55:07.9166250Z [ 78%] Built target VEIL_AU
+2026-10-24T03:55:07.9361180Z [ 79%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_audio_utils/juce_audio_utils.mm.o
+2026-10-24T03:55:10.4417120Z [ 80%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_audio_processors/juce_audio_processors_ara.cpp.o
+2026-10-24T03:55:10.5445110Z [ 81%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_audio_processors/juce_audio_processors_lv2_libs.cpp.o
+2026-10-24T03:55:10.6105450Z [ 82%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_audio_processors/juce_audio_processors.mm.o
+2026-10-24T03:55:13.0957620Z [ 83%] Linking CXX CFBundle shared module VEIL_artefacts/Release/VST3/VEIL.vst3/Contents/MacOS/VEIL
+2026-10-24T03:55:14.4081910Z /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build/VEIL_artefacts/Release/VST3/VEIL.vst3: code has no resources but signature indicates they must be present
+2026-10-24T03:55:14.4088830Z -- Replacing invalid signature with ad-hoc signature
+2026-10-24T03:55:14.4273790Z /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build/VEIL_artefacts/Release/VST3/VEIL.vst3: replacing existing signature
+2026-10-24T03:55:14.4932600Z removing moduleinfo.json
+2026-10-24T03:55:14.5141130Z creating /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build/VEIL_artefacts/Release/VST3/VEIL.vst3/Contents/Resources/moduleinfo.json
+2026-10-24T03:55:14.6026450Z [ 83%] Built target VEIL_VST3
+2026-10-24T03:55:14.6184320Z [ 85%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_gui_extra/juce_gui_extra.mm.o
+2026-10-24T03:55:15.7131910Z [ 86%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_gui_basics/juce_gui_basics.mm.o
+2026-10-24T03:55:18.5570070Z In file included from /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build/_deps/juce-src/modules/juce_gui_basics/juce_gui_basics.mm:35:
+2026-10-24T03:55:18.5665930Z /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build/_deps/juce-src/modules/juce_gui_basics/juce_gui_basics.cpp:61:2: warning: This version of JUCE does not use the splash screen, the flag JUCE_DISPLAY_SPLASH_SCREEN is ignored [-W#pragma-messages]
+2026-10-24T03:55:18.5769000Z  JUCE_COMPILER_WARNING ("This version of JUCE does not use the splash screen, the flag JUCE_DISPLAY_SPLASH_SCREEN is ignored")
+2026-10-24T03:55:18.5872630Z  ^
+2026-10-24T03:55:18.5976120Z /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build/_deps/juce-src/modules/juce_core/system/juce_PlatformDefs.h:286:38: note: expanded from macro 'JUCE_COMPILER_WARNING'
+2026-10-24T03:55:18.6079660Z  #define JUCE_COMPILER_WARNING(msg)  _Pragma (JUCE_STRINGIFY (message (msg)))
+2026-10-24T03:55:18.6181920Z                                      ^
+2026-10-24T03:55:18.6283350Z <scratch space>:357:2: note: expanded from here
+2026-10-24T03:55:18.6384960Z  message ("This version of JUCE does not use the splash screen, the flag JUCE_DISPLAY_SPLASH_SCREEN is ignored")
+2026-10-24T03:55:18.6487010Z  ^
+2026-10-24T03:55:23.0206090Z [ 87%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_graphics/juce_graphics_Harfbuzz.cpp.o
+2026-10-24T03:55:23.8896940Z [ 88%] Building C object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_graphics/juce_graphics_Sheenbidi.c.o
+2026-10-24T03:55:24.5034260Z [ 89%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_graphics/juce_graphics.mm.o
+2026-10-24T03:55:48.6951130Z [ 90%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_events/juce_events.mm.o
+2026-10-24T03:55:48.8470500Z [ 91%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_core/juce_core_CompilationTime.cpp.o
+2026-10-24T03:55:48.9306960Z [ 93%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_core/juce_core.mm.o
+2026-10-24T03:55:53.2252860Z [ 94%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_data_structures/juce_data_structures.mm.o
+2026-10-24T03:55:55.9924830Z [ 95%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_audio_basics/juce_audio_basics.mm.o
+2026-10-24T03:55:57.3988160Z 1 warning generated.
+2026-10-24T03:55:57.5021960Z [ 96%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_audio_formats/juce_audio_formats.mm.o
+2026-10-24T03:56:03.3611490Z [ 97%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_audio_devices/juce_audio_devices.mm.o
+2026-10-24T03:56:06.1696790Z [ 98%] Building CXX object CMakeFiles/VeilTests.dir/_deps/juce-src/modules/juce_dsp/juce_dsp.mm.o
+2026-10-24T03:56:13.1173100Z [100%] Linking CXX executable VeilTests_artefacts/Release/VeilTests
+2026-10-24T03:56:13.7165460Z [100%] Built target VeilTests
+2026-10-24T03:56:13.7624420Z ##[group]Run ctest --test-dir build --output-on-failure
+2026-10-24T03:56:13.7625800Z [36;1mctest --test-dir build --output-on-failure[0m
+2026-10-24T03:56:13.7777790Z shell: /bin/bash -e {0}
+2026-10-24T03:56:13.7778800Z ##[endgroup]
+2026-10-24T03:56:13.9468430Z Test project /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build
+2026-10-24T03:56:13.9515230Z     Start 1: veil_regression
+2026-10-24T03:56:15.1967890Z 1/1 Test #1: veil_regression ..................   Passed    1.24 sec
+2026-10-24T03:56:15.2044890Z 
+2026-10-24T03:56:15.2046580Z 100% tests passed out of 1
+2026-10-24T03:56:15.2047120Z 
+2026-10-24T03:56:15.2049540Z Total Test time (real) =   1.25 sec
+2026-10-24T03:56:15.2121490Z ##[group]Run bash scripts/validate-au-macos.sh
+2026-10-24T03:56:15.2122090Z [36;1mbash scripts/validate-au-macos.sh[0m
+2026-10-24T03:56:15.2254660Z shell: /bin/bash -e {0}
+2026-10-24T03:56:15.2255040Z ##[endgroup]
+2026-10-24T03:56:16.0769990Z ProductName:		macOS
+2026-10-24T03:56:16.0770950Z ProductVersion:		14.8.9
+2026-10-24T03:56:16.0771700Z BuildVersion:		23J631
+2026-10-24T03:56:16.0772250Z arm64
+2026-10-24T03:56:16.0773270Z build/VEIL_artefacts/Release/AU/VEIL.component/Contents/MacOS/VEIL: Mach-O 64-bit bundle arm64
+2026-10-24T03:56:16.0774400Z arm64
+2026-10-24T03:56:16.0774970Z Dict {
+2026-10-24T03:56:16.0775440Z     CFBundleName = VEIL
+2026-10-24T03:56:16.0776580Z     CFBundleIdentifier = audio.veil.processor
+2026-10-24T03:56:16.0777470Z     CFBundleVersion = 1.0.0
+2026-10-24T03:56:16.0778160Z     CFBundleExecutable = VEIL
+2026-10-24T03:56:16.0778950Z     CFBundleDisplayName = VEIL
+2026-10-24T03:56:16.0779650Z     AudioComponents = Array {
+2026-10-24T03:56:16.0780850Z         Dict {
+2026-10-24T03:56:16.0781380Z             manufacturer = Veil
+2026-10-24T03:56:16.0782130Z             resourceUsage = Dict {
+2026-10-24T03:56:16.0792090Z                 temporary-exception.files.all.read-write = true
+2026-10-24T03:56:16.0793050Z                 network.client = true
+2026-10-24T03:56:16.0793700Z             }
+2026-10-24T03:56:16.0794290Z             subtype = Vel1
+2026-10-24T03:56:16.0795190Z             version = 65536
+2026-10-24T03:56:16.0795660Z             type = aufx
+2026-10-24T03:56:16.0795970Z             factoryFunction = VEILAUFactory
+2026-10-24T03:56:16.0796340Z             name = Veil Audio: VEIL
+2026-10-24T03:56:16.0796760Z             description = Dark Fantasy Audio Processor
+2026-10-24T03:56:16.0797060Z         }
+2026-10-24T03:56:16.0797310Z     }
+2026-10-24T03:56:16.0797530Z     NSHighResolutionCapable = true
+2026-10-24T03:56:16.0797890Z     CFBundleSignature = ????
+2026-10-24T03:56:16.0798150Z     CFBundleIconFile = 
+2026-10-24T03:56:16.0798480Z     CFBundlePackageType = BNDL
+2026-10-24T03:56:16.0798750Z     NSHumanReadableCopyright = 
+2026-10-24T03:56:16.0799110Z     CFBundleShortVersionString = 1.0.0
+2026-10-24T03:56:16.0799430Z }
+2026-10-24T03:56:16.2635350Z Original bundle signature verification exit: 1
+2026-10-24T03:56:16.2674520Z build/VEIL_artefacts/Release/AU/VEIL.component: code has no resources but signature indicates they must be present
+2026-10-24T03:56:16.2918120Z build/VEIL_artefacts/Release/AU/VEIL.component: replacing existing signature
+2026-10-24T03:56:16.3474100Z build/VEIL_artefacts/Release/AU/VEIL.component: valid on disk
+2026-10-24T03:56:16.3476140Z build/VEIL_artefacts/Release/AU/VEIL.component: satisfies its Designated Requirement
+2026-10-24T03:56:16.4237970Z /Users/runner/Library/Audio/Plug-Ins/Components/VEIL.component: valid on disk
+2026-10-24T03:56:16.4239760Z /Users/runner/Library/Audio/Plug-Ins/Components/VEIL.component: satisfies its Designated Requirement
+2026-10-24T03:56:22.7342630Z AU registered after discovery attempt 2.
+2026-10-24T03:56:22.7396790Z 
+2026-10-24T03:56:22.7402780Z     AU Validation Tool
+2026-10-24T03:56:22.7417730Z     Version: 1.10.0 
+2026-10-24T03:56:22.7459080Z     Copyright 2003-2019, Apple Inc. All Rights Reserved.
+2026-10-24T03:56:22.7610100Z     Specify -h (-help) for command options
+2026-10-24T03:56:22.7680110Z 
+2026-10-24T03:56:22.7692000Z aufx Vel1 Veil  -  Veil Audio: VEIL
+2026-10-24T03:56:22.7697790Z aufx bpas appl  -  Apple: AUBandpass
+2026-10-24T03:56:22.7703280Z aufx dcmp appl  -  Apple: AUDynamicsProcessor
+2026-10-24T03:56:22.7708750Z aufx dely appl  -  Apple: AUDelay
+2026-10-24T03:56:22.7718950Z aufx dist appl  -  Apple: AUDistortion
+2026-10-24T03:56:22.7725860Z aufx filt appl  -  Apple: AUFilter
+2026-10-24T03:56:22.7733410Z aufx greq appl  -  Apple: AUGraphicEQ
+2026-10-24T03:56:22.7748760Z aufx hpas appl  -  Apple: AUHipass
+2026-10-24T03:56:22.7749460Z aufx hshf appl  -  Apple: AUHighShelfFilter
+2026-10-24T03:56:22.7750250Z aufx lmtr appl  -  Apple: AUPeakLimiter
+2026-10-24T03:56:22.7755060Z aufx lpas appl  -  Apple: AULowpass
+2026-10-24T03:56:22.7756150Z aufx lshf appl  -  Apple: AULowShelfFilter
+2026-10-24T03:56:22.7757130Z aufx mcmp appl  -  Apple: AUMultibandCompressor
+2026-10-24T03:56:22.7757900Z aufx mrev appl  -  Apple: AUMatrixReverb
+2026-10-24T03:56:22.7759330Z aufx nbeq appl  -  Apple: AUNBandEQ
+2026-10-24T03:56:22.7760070Z aufx nsnd appl  -  Apple: AUNetSend
+2026-10-24T03:56:22.7760940Z aufx nutp appl  -  Apple: AUNewPitch
+2026-10-24T03:56:22.7761620Z aufx pmeq appl  -  Apple: AUParametricEQ
+2026-10-24T03:56:22.7762280Z aufx raac appl  -  Apple: AURoundTripAAC
+2026-10-24T03:56:22.7763140Z aufx rogr appl  -  Apple: AURogerBeep
+2026-10-24T03:56:22.7763920Z aufx rvb2 appl  -  Apple: AUReverb2
+2026-10-24T03:56:22.7764560Z aufx sdly appl  -  Apple: AUSampleDelay
+2026-10-24T03:56:22.7765740Z aufx tmpt appl  -  Apple: AUPitch
+2026-10-24T03:56:22.7766660Z aufx vois appl  -  Apple: AUSoundIsolation
+2026-10-24T03:56:22.7768030Z aupn ambi appl  -  Apple: AUSoundFieldPanner
+2026-10-24T03:56:22.7768590Z aupn hrtf appl  -  Apple: HRTFPanner
+2026-10-24T03:56:22.7770470Z aupn sphr appl  -  Apple: AUSphericalHeadPanner
+2026-10-24T03:56:22.7772250Z aupn vbas appl  -  Apple: AUVectorPanner
+2026-10-24T03:56:22.7773880Z aumu dls  appl  -  Apple: DLSMusicDevice
+2026-10-24T03:56:22.7774440Z aumu msyn appl  -  Apple: AUMIDISynth
+2026-10-24T03:56:22.7775040Z aumu samp appl  -  Apple: AUSampler
+2026-10-24T03:56:22.7775680Z aumx 3dem appl  -  Apple: AUSpatialMixer
+2026-10-24T03:56:22.7776300Z aumx 3dmx appl  -  Apple: AUMixer3D
+2026-10-24T03:56:22.7777060Z aumx mcmx appl  -  Apple: AUMultiChannelMixer
+2026-10-24T03:56:22.7777650Z aumx mspl appl  -  Apple: AUMultiSplitter
+2026-10-24T03:56:22.7778330Z aumx mxmx appl  -  Apple: AUMatrixMixer
+2026-10-24T03:56:22.7778900Z aumx smxr appl  -  Apple: AUMixer
+2026-10-24T03:56:22.7779350Z aufc conv appl  -  Apple: AUConverter
+2026-10-24T03:56:22.7779920Z aufc defr appl  -  Apple: AUDeferredRenderer
+2026-10-24T03:56:22.7783780Z aufc ipto appl  -  Apple: AUNotQuiteSoSimpleTime
+2026-10-24T03:56:22.7784700Z aufc merg appl  -  Apple: AUMerger
+2026-10-24T03:56:22.7785120Z aufc nutp appl  -  Apple: AUNewTimePitch
+2026-10-24T03:56:22.7787350Z aufc splt appl  -  Apple: AUSplitter
+2026-10-24T03:56:22.7787900Z aufc tmpt appl  -  Apple: AUTimePitch
+2026-10-24T03:56:22.7790260Z aufc vari appl  -  Apple: AUVarispeed
+2026-10-24T03:56:22.7791570Z auou ahal appl  -  Apple: AudioDeviceOutput
+2026-10-24T03:56:22.7792520Z auou atap appl  -  Apple: AUAudioTapIO
+2026-10-24T03:56:22.7793660Z auou def  appl  -  Apple: DefaultOutputUnit
+2026-10-24T03:56:22.7794660Z auou genr appl  -  Apple: GenericOutput
+2026-10-24T03:56:22.7795800Z auou rioc appl  -  Apple: AUAudioIO
+2026-10-24T03:56:22.7796950Z auou sys  appl  -  Apple: SystemOutputUnit
+2026-10-24T03:56:22.7798490Z auou vpio appl  -  Apple: AUVoiceProcessor
+2026-10-24T03:56:22.7823120Z augn afpl appl  -  Apple: AUAudioFilePlayer
+2026-10-24T03:56:22.7825170Z augn nrcv appl  -  Apple: AUNetReceive
+2026-10-24T03:56:22.7843530Z augn sspl appl  -  Apple: AUScheduledSoundPlayer
+2026-10-24T03:56:22.7844680Z augn ttsp appl  -  Apple: AUSpeechSynthesis
+2026-10-24T03:56:22.7845240Z auol tmpt appl  -  Apple: AUTimePitch
+2026-10-24T03:56:22.7847990Z auol vari appl  -  Apple: AUVarispeed
+2026-10-24T03:56:22.7848850Z 
+2026-10-24T03:56:22.7849130Z     AU Validation Tool
+2026-10-24T03:56:22.7849500Z     Version: 1.10.0 
+2026-10-24T03:56:22.7850260Z     Copyright 2003-2019, Apple Inc. All Rights Reserved.
+2026-10-24T03:56:22.7852660Z     Specify -h (-help) for command options
+2026-10-24T03:56:22.7853100Z 
+2026-10-24T03:56:22.7853390Z --------------------------------------------------
+2026-10-24T03:56:22.7853730Z VALIDATING AUDIO UNIT: 'aufx' - 'Vel1' - 'Veil'
+2026-10-24T03:56:22.7854130Z --------------------------------------------------
+2026-10-24T03:56:22.7854500Z Manufacturer String: Veil Audio
+2026-10-24T03:56:22.7855190Z AudioUnit Name: VEIL
+2026-10-24T03:56:22.7855520Z Component Version: 1.0.0 (0x10000)
+2026-10-24T03:56:22.7876180Z 
+2026-10-24T03:56:22.7877090Z * * PASS
+2026-10-24T03:56:22.7879260Z --------------------------------------------------
+2026-10-24T03:56:22.7880070Z TESTING OPEN TIMES:
+2026-10-24T03:56:22.7880740Z COLD:
+2026-10-24T03:56:22.7999370Z Time to open AudioUnit:         9.928 ms
+2026-10-24T03:56:22.8100510Z WARM:
+2026-10-24T03:56:22.8102730Z Time to open AudioUnit:         1.593  ms
+2026-10-24T03:56:22.8104130Z This AudioUnit is a version 2 implementation.
+2026-10-24T03:56:22.8104460Z FIRST TIME:
+2026-10-24T03:56:22.8104770Z Time for initialization:        0.163 ms
+2026-10-24T03:56:22.8105040Z 
+2026-10-24T03:56:22.8105190Z * * PASS
+2026-10-24T03:56:22.8105550Z --------------------------------------------------
+2026-10-24T03:56:22.8105960Z VERIFYING DEFAULT SCOPE FORMATS:
+2026-10-24T03:56:22.8106350Z Input Scope Bus Configuration:
+2026-10-24T03:56:22.8106650Z  Default Bus Count:1
+2026-10-24T03:56:22.8106970Z     Bus Name: Input
+2026-10-24T03:56:22.8107360Z     Default Format: AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+2026-10-24T03:56:22.8107950Z     Has Channel Layouts: 0x640001 0x650002 0x660002 0x670002 0x6A0002 
+2026-10-24T03:56:22.8108380Z     Default Layout:
+2026-10-24T03:56:22.8108630Z 	Tag=0x650002, Num Chan Descs=0
+2026-10-24T03:56:22.8111240Z 
+2026-10-24T03:56:22.8112130Z Output Scope Bus Configuration:
+2026-10-24T03:56:22.8112930Z  Default Bus Count:1
+2026-10-24T03:56:22.8114200Z     Bus Name: Output
+2026-10-24T03:56:22.8115170Z     Default Format: AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+2026-10-24T03:56:22.8116200Z     Has Channel Layouts: 0x640001 0x650002 0x660002 0x670002 0x6A0002 
+2026-10-24T03:56:22.8116920Z     Default Layout:
+2026-10-24T03:56:22.8117270Z 	Tag=0x650002, Num Chan Descs=0
+2026-10-24T03:56:22.8119390Z 
+2026-10-24T03:56:22.8119600Z * * PASS
+2026-10-24T03:56:22.8119910Z --------------------------------------------------
+2026-10-24T03:56:22.8120670Z VERIFYING REQUIRED PROPERTIES:
+2026-10-24T03:56:22.8120930Z 
+2026-10-24T03:56:22.8121110Z * * PASS
+2026-10-24T03:56:22.8121490Z --------------------------------------------------
+2026-10-24T03:56:22.8122040Z VERIFYING RECOMMENDED PROPERTIES:
+2026-10-24T03:56:22.8122650Z   VERIFYING PROPERTY: Latency
+2026-10-24T03:56:22.8123100Z     PASS
+2026-10-24T03:56:22.8123450Z   VERIFYING PROPERTY: Tail Time
+2026-10-24T03:56:22.8123870Z     PASS
+2026-10-24T03:56:22.8124300Z   VERIFYING PROPERTY: Bypass Effect
+2026-10-24T03:56:22.8124690Z     PASS
+2026-10-24T03:56:22.8124930Z 
+2026-10-24T03:56:22.8125100Z * * PASS
+2026-10-24T03:56:22.8130410Z --------------------------------------------------
+2026-10-24T03:56:22.8139790Z VERIFYING OPTIONAL PROPERTIES:
+2026-10-24T03:56:22.8140290Z 
+2026-10-24T03:56:22.8140420Z * * PASS
+2026-10-24T03:56:22.8141170Z --------------------------------------------------
+2026-10-24T03:56:22.8142340Z VERIFYING SPECIAL PROPERTIES:
+2026-10-24T03:56:22.8142730Z 
+2026-10-24T03:56:22.8143140Z VERIFYING CUSTOM UI
+2026-10-24T03:56:22.8143910Z Cocoa Views Available: 1
+2026-10-24T03:56:22.8144350Z   JUCE_AUCocoaViewClass_ae31499702424b8c
+2026-10-24T03:56:22.8145090Z     PASS
+2026-10-24T03:56:22.8145540Z 
+2026-10-24T03:56:22.8145650Z HAS FACTORY PRESETS
+2026-10-24T03:56:22.8146170Z     ID:   0    Name: Forgotten Kingdom
+2026-10-24T03:56:22.8146900Z     ID:   1    Name: Cathedral at Midnight
+2026-10-24T03:56:22.8147420Z     ID:   2    Name: The Hollow Choir
+2026-10-24T03:56:22.8148490Z     ID:   3    Name: Abyssal Drone
+2026-10-24T03:56:22.8148980Z     ID:   4    Name: Cursed Forest
+2026-10-24T03:56:22.8164150Z     ID:   5    Name: Fallen Angel
+2026-10-24T03:56:22.8167670Z     ID:   6    Name: Ashes of a King
+2026-10-24T03:56:22.8169990Z     ID:   7    Name: Moonlit Ruins
+2026-10-24T03:56:22.8172120Z     ID:   8    Name: The Black Citadel
+2026-10-24T03:56:22.8172920Z     ID:   9    Name: Ghosts of the Chapel
+2026-10-24T03:56:22.8173350Z     ID:  10    Name: Witch's Lament
+2026-10-24T03:56:22.8174410Z     ID:  11    Name: Eternal Winter
+2026-10-24T03:56:22.8175050Z     ID:  12    Name: The Final Ritual
+2026-10-24T03:56:22.8177940Z     ID:  13    Name: Ancient Spellbook
+2026-10-24T03:56:22.8179710Z     ID:  14    Name: Throne of Shadows
+2026-10-24T03:56:22.8180510Z 
+2026-10-24T03:56:22.8180960Z VERIFYING CLASS INFO
+2026-10-24T03:56:22.8182210Z     PASS
+2026-10-24T03:56:22.8182610Z 
+2026-10-24T03:56:22.8183140Z TESTING HOST CALLBACKS
+2026-10-24T03:56:22.8184260Z     PASS
+2026-10-24T03:56:22.8184970Z 
+2026-10-24T03:56:22.8185290Z * * PASS
+2026-10-24T03:56:22.8186500Z --------------------------------------------------
+2026-10-24T03:56:22.8189300Z PUBLISHED PARAMETER INFO:
+2026-10-24T03:56:22.8189760Z 
+2026-10-24T03:56:22.8208230Z # # # 61 Global Scope Parameters:
+2026-10-24T03:56:22.8208850Z Parameter ID:96511
+2026-10-24T03:56:22.8209330Z Name: Age
+2026-10-24T03:56:22.8210070Z Parameter Type: Generic
+2026-10-24T03:56:22.8210620Z Values: Minimum = 0.0000000, Default = 0.1200000, Maximum = 1.0000000
+2026-10-24T03:56:22.8211370Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8213300Z   -parameter PASS
+2026-10-24T03:56:22.8214400Z 
+2026-10-24T03:56:22.8215530Z Parameter ID:3027047
+2026-10-24T03:56:22.8216850Z Name: Spectral Blur
+2026-10-24T03:56:22.8217460Z Parameter Type: Generic
+2026-10-24T03:56:22.8219600Z Values: Minimum = 0.0000000, Default = 0.2000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8221070Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8222260Z   -parameter PASS
+2026-10-24T03:56:22.8223220Z 
+2026-10-24T03:56:22.8223710Z Parameter ID:3095218
+2026-10-24T03:56:22.8224950Z Name: Dust
+2026-10-24T03:56:22.8225980Z Parameter Type: Generic
+2026-10-24T03:56:22.8226650Z Values: Minimum = 0.0000000, Default = 0.0000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8227510Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8229070Z   -parameter PASS
+2026-10-24T03:56:22.8230560Z 
+2026-10-24T03:56:22.8230780Z Parameter ID:62276150
+2026-10-24T03:56:22.8232620Z Name: The Wraith
+2026-10-24T03:56:22.8233220Z Parameter Type: Boolean
+2026-10-24T03:56:22.8233760Z Values: Minimum = Off, Default = On, Maximum = On
+2026-10-24T03:56:22.8298690Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8299220Z   -parameter PASS
+2026-10-24T03:56:22.8299390Z 
+2026-10-24T03:56:22.8299510Z Parameter ID:95459258
+2026-10-24T03:56:22.8299760Z Name: Decay
+2026-10-24T03:56:22.8301050Z Parameter Type: Generic
+2026-10-24T03:56:22.8301470Z Values: Minimum = 0.5000000, Default = 5.0000000, Maximum = 20.0000000
+2026-10-24T03:56:22.8301920Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8302250Z   -parameter PASS
+2026-10-24T03:56:22.8302350Z 
+2026-10-24T03:56:22.8302460Z Parameter ID:95852457
+2026-10-24T03:56:22.8302620Z Name: Drift
+2026-10-24T03:56:22.8302810Z Parameter Type: Generic
+2026-10-24T03:56:22.8303150Z Values: Minimum = 0.0000000, Default = 0.2000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8303580Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8304020Z   -parameter PASS
+2026-10-24T03:56:22.8304110Z 
+2026-10-24T03:56:22.8304170Z Parameter ID:95852938
+2026-10-24T03:56:22.8304360Z Name: Drive
+2026-10-24T03:56:22.8304560Z Parameter Type: Generic
+2026-10-24T03:56:22.8304860Z Values: Minimum = 0.0000000, Default = 3.0000000, Maximum = 24.0000000
+2026-10-24T03:56:22.8305260Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8305640Z   -parameter PASS
+2026-10-24T03:56:22.8305770Z 
+2026-10-24T03:56:22.8305880Z Parameter ID:98331279
+2026-10-24T03:56:22.8306070Z Name: Ghost
+2026-10-24T03:56:22.8306310Z Parameter Type: Generic
+2026-10-24T03:56:22.8306630Z Values: Minimum = 0.0000000, Default = 0.2000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8307130Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8307450Z   -parameter PASS
+2026-10-24T03:56:22.8307580Z 
+2026-10-24T03:56:22.8307680Z Parameter ID:109532587
+2026-10-24T03:56:22.8307870Z Name: Slope
+2026-10-24T03:56:22.8308630Z Parameter Type: Indexed
+2026-10-24T03:56:22.8308890Z Values: Minimum = 12 dB, Default = 24 dB, Maximum = 24 dB
+2026-10-24T03:56:22.8309420Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8309690Z Parameter has Value Strings
+2026-10-24T03:56:22.8309970Z Num Strings = 2
+2026-10-24T03:56:22.8310160Z Value: 0,  String: 12 dB
+2026-10-24T03:56:22.8310460Z Value: 1,  String: 24 dB
+2026-10-24T03:56:22.8310690Z   -parameter PASS
+2026-10-24T03:56:22.8310830Z 
+2026-10-24T03:56:22.8310920Z Parameter ID:109637894
+2026-10-24T03:56:22.8311120Z Name: Space
+2026-10-24T03:56:22.8311340Z Parameter Type: Generic
+2026-10-24T03:56:22.8311660Z Values: Minimum = 0.0000000, Default = 0.6500000, Maximum = 1.0000000
+2026-10-24T03:56:22.8312050Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8312490Z   -parameter PASS
+2026-10-24T03:56:22.8312630Z 
+2026-10-24T03:56:22.8312680Z Parameter ID:157452366
+2026-10-24T03:56:22.8312930Z Name: Resonance
+2026-10-24T03:56:22.8313210Z Parameter Type: Generic
+2026-10-24T03:56:22.8313570Z Values: Minimum = 0.1000000, Default = 0.2500000, Maximum = 1.0000000
+2026-10-24T03:56:22.8314900Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8315280Z   -parameter PASS
+2026-10-24T03:56:22.8315370Z 
+2026-10-24T03:56:22.8315480Z Parameter ID:387933113
+2026-10-24T03:56:22.8315730Z Name: Wet / Dry
+2026-10-24T03:56:22.8315910Z Parameter Type: Generic
+2026-10-24T03:56:22.8316180Z Values: Minimum = 0.0000000, Default = 0.6500000, Maximum = 1.0000000
+2026-10-24T03:56:22.8316590Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8316960Z   -parameter PASS
+2026-10-24T03:56:22.8317100Z 
+2026-10-24T03:56:22.8317200Z Parameter ID:389880618
+2026-10-24T03:56:22.8317380Z Name: Crypt Mix
+2026-10-24T03:56:22.8317600Z Parameter Type: Generic
+2026-10-24T03:56:22.8317880Z Values: Minimum = 0.0000000, Default = 0.3200000, Maximum = 1.0000000
+2026-10-24T03:56:22.8318270Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8318550Z   -parameter PASS
+2026-10-24T03:56:22.8318680Z 
+2026-10-24T03:56:22.8318740Z Parameter ID:462099667
+2026-10-24T03:56:22.8318930Z Name: High-Pass
+2026-10-24T03:56:22.8319150Z Parameter Type: Generic
+2026-10-24T03:56:22.8319380Z Values: Minimum = 20.0000000, Default = 35.0000000, Maximum = 800.0000000
+2026-10-24T03:56:22.8319740Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8320010Z   -parameter PASS
+2026-10-24T03:56:22.8320180Z 
+2026-10-24T03:56:22.8320230Z Parameter ID:570418373
+2026-10-24T03:56:22.8320380Z Name: Interval
+2026-10-24T03:56:22.8320510Z Parameter Type: Indexed
+2026-10-24T03:56:22.8320750Z Values: Minimum = Octave below, Default = Fifth above, Maximum = Unison
+2026-10-24T03:56:22.8321110Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8321380Z Parameter has Value Strings
+2026-10-24T03:56:22.8321540Z Num Strings = 5
+2026-10-24T03:56:22.8321690Z Value: 0,  String: Octave below
+2026-10-24T03:56:22.8321860Z Value: 1,  String: Fifth below
+2026-10-24T03:56:22.8322040Z Value: 2,  String: Fifth above
+2026-10-24T03:56:22.8322210Z Value: 3,  String: Octave above
+2026-10-24T03:56:22.8322380Z Value: 4,  String: Unison
+2026-10-24T03:56:22.8322530Z   -parameter PASS
+2026-10-24T03:56:22.8322620Z 
+2026-10-24T03:56:22.8322670Z Parameter ID:574975266
+2026-10-24T03:56:22.8322810Z Name: Movement
+2026-10-24T03:56:22.8322940Z Parameter Type: Generic
+2026-10-24T03:56:22.8323170Z Values: Minimum = 0.0000000, Default = 0.2500000, Maximum = 1.0000000
+2026-10-24T03:56:22.8323520Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8323790Z   -parameter PASS
+2026-10-24T03:56:22.8323880Z 
+2026-10-24T03:56:22.8323930Z Parameter ID:594350200
+2026-10-24T03:56:22.8324090Z Name: Movement Rate
+2026-10-24T03:56:22.8324910Z Parameter Type: Generic
+2026-10-24T03:56:22.8326540Z Values: Minimum = 0.0200000, Default = 0.1500000, Maximum = 4.0000000
+2026-10-24T03:56:22.8327530Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8328340Z   -parameter PASS
+2026-10-24T03:56:22.8328900Z 
+2026-10-24T03:56:22.8329070Z Parameter ID:594402867
+2026-10-24T03:56:22.8329580Z Name: Movement Sync
+2026-10-24T03:56:22.8330030Z Parameter Type: Indexed
+2026-10-24T03:56:22.8330620Z Values: Minimum = Free, Default = Free, Maximum = 4 beats
+2026-10-24T03:56:22.8331550Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8332390Z Parameter has Value Strings
+2026-10-24T03:56:22.8332880Z Num Strings = 2
+2026-10-24T03:56:22.8333340Z Value: 0,  String: Free
+2026-10-24T03:56:22.8333820Z Value: 1,  String: 4 beats
+2026-10-24T03:56:22.8334310Z   -parameter PASS
+2026-10-24T03:56:22.8334580Z 
+2026-10-24T03:56:22.8334750Z Parameter ID:681800402
+2026-10-24T03:56:22.8335190Z Name: The Echoes
+2026-10-24T03:56:22.8335610Z Parameter Type: Boolean
+2026-10-24T03:56:22.8336130Z Values: Minimum = Off, Default = On, Maximum = On
+2026-10-24T03:56:22.8336920Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8338260Z   -parameter PASS
+2026-10-24T03:56:22.8338520Z 
+2026-10-24T03:56:22.8338690Z Parameter ID:729666843
+2026-10-24T03:56:22.8339120Z Name: Texture
+2026-10-24T03:56:22.8339520Z Parameter Type: Generic
+2026-10-24T03:56:22.8340150Z Values: Minimum = 0.0000000, Default = 0.1800000, Maximum = 1.0000000
+2026-10-24T03:56:22.8341110Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8341890Z   -parameter PASS
+2026-10-24T03:56:22.8342150Z 
+2026-10-24T03:56:22.8342320Z Parameter ID:751733906
+2026-10-24T03:56:22.8342750Z Name: The Choir
+2026-10-24T03:56:22.8343150Z Parameter Type: Boolean
+2026-10-24T03:56:22.8343680Z Values: Minimum = Off, Default = On, Maximum = On
+2026-10-24T03:56:22.8344460Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8345190Z   -parameter PASS
+2026-10-24T03:56:22.8345450Z 
+2026-10-24T03:56:22.8345630Z Parameter ID:772786938
+2026-10-24T03:56:22.8346060Z Name: Motion Pattern
+2026-10-24T03:56:22.8346520Z Parameter Type: Indexed
+2026-10-24T03:56:22.8347100Z Values: Minimum = Circle, Default = Circle, Maximum = Wander
+2026-10-24T03:56:22.8347970Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8348700Z Parameter has Value Strings
+2026-10-24T03:56:22.8349170Z Num Strings = 3
+2026-10-24T03:56:22.8349570Z Value: 0,  String: Circle
+2026-10-24T03:56:22.8350030Z Value: 1,  String: Pendulum
+2026-10-24T03:56:22.8350510Z Value: 2,  String: Wander
+2026-10-24T03:56:22.8350960Z   -parameter PASS
+2026-10-24T03:56:22.8351210Z 
+2026-10-24T03:56:22.8351380Z Parameter ID:773352680
+2026-10-24T03:56:22.8351810Z Name: Bypass
+2026-10-24T03:56:22.8352200Z Parameter Type: Boolean
+2026-10-24T03:56:22.8352720Z Values: Minimum = Off, Default = Off, Maximum = On
+2026-10-24T03:56:22.8353510Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8354220Z   -parameter PASS
+2026-10-24T03:56:22.8354470Z 
+2026-10-24T03:56:22.8354640Z Parameter ID:798419949
+2026-10-24T03:56:22.8355070Z Name: Cutoff
+2026-10-24T03:56:22.8355470Z Parameter Type: Generic
+2026-10-24T03:56:22.8356130Z Values: Minimum = 80.0000000, Default = 6500.0000000, Maximum = 18000.0000000
+2026-10-24T03:56:22.8357130Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8357920Z   -parameter PASS
+2026-10-24T03:56:22.8358170Z 
+2026-10-24T03:56:22.8358430Z Parameter ID:816144857
+2026-10-24T03:56:22.8358940Z Name: Echoes Mix
+2026-10-24T03:56:22.8359340Z Parameter Type: Generic
+2026-10-24T03:56:22.8359960Z Values: Minimum = 0.0000000, Default = 0.2000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8361270Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8362060Z   -parameter PASS
+2026-10-24T03:56:22.8362320Z 
+2026-10-24T03:56:22.8363620Z Parameter ID:827409568
+2026-10-24T03:56:22.8364140Z Name: Pre-Delay
+2026-10-24T03:56:22.8364550Z Parameter Type: Generic
+2026-10-24T03:56:22.8365170Z Values: Minimum = 0.0000000, Default = 35.0000000, Maximum = 200.0000000
+2026-10-24T03:56:22.8366160Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8366940Z   -parameter PASS
+2026-10-24T03:56:22.8367200Z 
+2026-10-24T03:56:22.8367360Z Parameter ID:873230368
+2026-10-24T03:56:22.8367780Z Name: Output
+2026-10-24T03:56:22.8368240Z Parameter Type: Generic
+2026-10-24T03:56:22.8370430Z Values: Minimum = -24.0000000, Default = -3.0000007, Maximum = 12.0000000
+2026-10-24T03:56:22.8371070Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8371560Z   -parameter PASS
+2026-10-24T03:56:22.8372010Z 
+2026-10-24T03:56:22.8372440Z Parameter ID:881080983
+2026-10-24T03:56:22.8372860Z Name: Freeze
+2026-10-24T03:56:22.8373350Z Parameter Type: Boolean
+2026-10-24T03:56:22.8373650Z Values: Minimum = Off, Default = Off, Maximum = On
+2026-10-24T03:56:22.8374470Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8374840Z   -parameter PASS
+2026-10-24T03:56:22.8375860Z 
+2026-10-24T03:56:22.8375950Z Parameter ID:933347518
+2026-10-24T03:56:22.8376550Z Name: Choir Blend
+2026-10-24T03:56:22.8376800Z Parameter Type: Generic
+2026-10-24T03:56:22.8377930Z Values: Minimum = 0.0000000, Default = 0.1300000, Maximum = 1.0000000
+2026-10-24T03:56:22.8379260Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8380480Z   -parameter PASS
+2026-10-24T03:56:22.8380990Z 
+2026-10-24T03:56:22.8381310Z Parameter ID:961969367
+2026-10-24T03:56:22.8381590Z Name: The Abyss
+2026-10-24T03:56:22.8382140Z Parameter Type: Boolean
+2026-10-24T03:56:22.8382390Z Values: Minimum = Off, Default = On, Maximum = On
+2026-10-24T03:56:22.8382810Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8383140Z   -parameter PASS
+2026-10-24T03:56:22.8383280Z 
+2026-10-24T03:56:22.8383370Z Parameter ID:1022338836
+2026-10-24T03:56:22.8383590Z Name: Width
+2026-10-24T03:56:22.8383740Z Parameter Type: Generic
+2026-10-24T03:56:22.8385030Z Values: Minimum = 0.0000000, Default = 0.9000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8385550Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8386700Z   -parameter PASS
+2026-10-24T03:56:22.8386820Z 
+2026-10-24T03:56:22.8387250Z Parameter ID:1047471085
+2026-10-24T03:56:22.8387480Z Name: The Crypt
+2026-10-24T03:56:22.8387730Z Parameter Type: Boolean
+2026-10-24T03:56:22.8387960Z Values: Minimum = Off, Default = On, Maximum = On
+2026-10-24T03:56:22.8388360Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8389220Z   -parameter PASS
+2026-10-24T03:56:22.8390040Z 
+2026-10-24T03:56:22.8390220Z Parameter ID:1067733292
+2026-10-24T03:56:22.8390490Z Name: Detune
+2026-10-24T03:56:22.8390710Z Parameter Type: Generic
+2026-10-24T03:56:22.8391050Z Values: Minimum = 0.0000000, Default = 7.0000000, Maximum = 30.0000000
+2026-10-24T03:56:22.8391480Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8392360Z   -parameter PASS
+2026-10-24T03:56:22.8392500Z 
+2026-10-24T03:56:22.8392570Z Parameter ID:1095034466
+2026-10-24T03:56:22.8392770Z Name: Ritual Engine
+2026-10-24T03:56:22.8392940Z Parameter Type: Boolean
+2026-10-24T03:56:22.8393160Z Values: Minimum = Off, Default = On, Maximum = On
+2026-10-24T03:56:22.8393740Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8394590Z   -parameter PASS
+2026-10-24T03:56:22.8395310Z 
+2026-10-24T03:56:22.8395620Z Parameter ID:1099846370
+2026-10-24T03:56:22.8395910Z Name: Reverse
+2026-10-24T03:56:22.8396100Z Parameter Type: Boolean
+2026-10-24T03:56:22.8396380Z Values: Minimum = Off, Default = Off, Maximum = On
+2026-10-24T03:56:22.8396800Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8397170Z   -parameter PASS
+2026-10-24T03:56:22.8397730Z 
+2026-10-24T03:56:22.8397840Z Parameter ID:1212976021
+2026-10-24T03:56:22.8398000Z Name: Ritual X
+2026-10-24T03:56:22.8398210Z Parameter Type: Generic
+2026-10-24T03:56:22.8398540Z Values: Minimum = 0.0000000, Default = 0.5000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8399220Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8399610Z   -parameter PASS
+2026-10-24T03:56:22.8399740Z 
+2026-10-24T03:56:22.8399830Z Parameter ID:1212976022
+2026-10-24T03:56:22.8400120Z Name: Ritual Y
+2026-10-24T03:56:22.8400680Z Parameter Type: Generic
+2026-10-24T03:56:22.8400990Z Values: Minimum = 0.0000000, Default = 0.5000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8401450Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8401790Z   -parameter PASS
+2026-10-24T03:56:22.8401940Z 
+2026-10-24T03:56:22.8402060Z Parameter ID:1251799411
+2026-10-24T03:56:22.8402320Z Name: Stereo Spread
+2026-10-24T03:56:22.8402480Z Parameter Type: Generic
+2026-10-24T03:56:22.8402720Z Values: Minimum = 0.0000000, Default = 0.6000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8403200Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8404560Z   -parameter PASS
+2026-10-24T03:56:22.8404710Z 
+2026-10-24T03:56:22.8404780Z Parameter ID:1253086416
+2026-10-24T03:56:22.8404990Z Name: Detune
+2026-10-24T03:56:22.8405240Z Parameter Type: Generic
+2026-10-24T03:56:22.8405630Z Values: Minimum = 0.0000000, Default = 4.0000000, Maximum = 30.0000000
+2026-10-24T03:56:22.8406100Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8406750Z   -parameter PASS
+2026-10-24T03:56:22.8407220Z 
+2026-10-24T03:56:22.8407320Z Parameter ID:1259109549
+2026-10-24T03:56:22.8407520Z Name: Motion Depth
+2026-10-24T03:56:22.8407770Z Parameter Type: Generic
+2026-10-24T03:56:22.8408100Z Values: Minimum = 0.0000000, Default = 0.4000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8408640Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8409020Z   -parameter PASS
+2026-10-24T03:56:22.8409370Z 
+2026-10-24T03:56:22.8409520Z Parameter ID:1317489605
+2026-10-24T03:56:22.8409900Z Name: Diffusion
+2026-10-24T03:56:22.8410140Z Parameter Type: Generic
+2026-10-24T03:56:22.8410540Z Values: Minimum = 0.0000000, Default = 0.2500000, Maximum = 1.0000000
+2026-10-24T03:56:22.8417510Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8417880Z   -parameter PASS
+2026-10-24T03:56:22.8417980Z 
+2026-10-24T03:56:22.8418050Z Parameter ID:1318872768
+2026-10-24T03:56:22.8418220Z Name: Low Cut
+2026-10-24T03:56:22.8418370Z Parameter Type: Generic
+2026-10-24T03:56:22.8418660Z Values: Minimum = 30.0000000, Default = 180.0000153, Maximum = 1000.0000000
+2026-10-24T03:56:22.8419070Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8419390Z   -parameter PASS
+2026-10-24T03:56:22.8419490Z 
+2026-10-24T03:56:22.8419560Z Parameter ID:1322873343
+2026-10-24T03:56:22.8419730Z Name: Damping
+2026-10-24T03:56:22.8419890Z Parameter Type: Generic
+2026-10-24T03:56:22.8420130Z Values: Minimum = 0.0000000, Default = 0.6000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8420540Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8420850Z   -parameter PASS
+2026-10-24T03:56:22.8420960Z 
+2026-10-24T03:56:22.8421020Z Parameter ID:1336493441
+2026-10-24T03:56:22.8421190Z Name: Voice Count
+2026-10-24T03:56:22.8421360Z Parameter Type: Generic
+2026-10-24T03:56:22.8421580Z Values: Minimum = 1, Default = 3, Maximum = 4
+2026-10-24T03:56:22.8421910Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8422240Z   -parameter PASS
+2026-10-24T03:56:22.8422330Z 
+2026-10-24T03:56:22.8422400Z Parameter ID:1426503094
+2026-10-24T03:56:22.8422570Z Name: Motion Rate
+2026-10-24T03:56:22.8422730Z Parameter Type: Generic
+2026-10-24T03:56:22.8423270Z Values: Minimum = 0.0100000, Default = 0.0400000, Maximum = 1.0000000
+2026-10-24T03:56:22.8423680Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8424020Z   -parameter PASS
+2026-10-24T03:56:22.8424110Z 
+2026-10-24T03:56:22.8424170Z Parameter ID:1426555761
+2026-10-24T03:56:22.8424340Z Name: Motion Sync
+2026-10-24T03:56:22.8424490Z Parameter Type: Indexed
+2026-10-24T03:56:22.8424720Z Values: Minimum = Free, Default = Free, Maximum = 16 beats
+2026-10-24T03:56:22.8425070Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8425380Z Parameter has Value Strings
+2026-10-24T03:56:22.8425550Z Num Strings = 2
+2026-10-24T03:56:22.8425710Z Value: 0,  String: Free
+2026-10-24T03:56:22.8425890Z Value: 1,  String: 16 beats
+2026-10-24T03:56:22.8426060Z   -parameter PASS
+2026-10-24T03:56:22.8426170Z 
+2026-10-24T03:56:22.8426230Z Parameter ID:1437187330
+2026-10-24T03:56:22.8426390Z Name: Damping
+2026-10-24T03:56:22.8426540Z Parameter Type: Generic
+2026-10-24T03:56:22.8426800Z Values: Minimum = 0.0000000, Default = 0.6500000, Maximum = 1.0000000
+2026-10-24T03:56:22.8427200Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8427820Z   -parameter PASS
+2026-10-24T03:56:22.8427910Z 
+2026-10-24T03:56:22.8427980Z Parameter ID:1470039715
+2026-10-24T03:56:22.8428140Z Name: Formant Character
+2026-10-24T03:56:22.8428320Z Parameter Type: Generic
+2026-10-24T03:56:22.8428570Z Values: Minimum = 0.0000000, Default = 0.4500000, Maximum = 1.0000000
+2026-10-24T03:56:22.8428970Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8429290Z   -parameter PASS
+2026-10-24T03:56:22.8429390Z 
+2026-10-24T03:56:22.8429450Z Parameter ID:1493757442
+2026-10-24T03:56:22.8429630Z Name: Blood Mix
+2026-10-24T03:56:22.8429780Z Parameter Type: Generic
+2026-10-24T03:56:22.8430030Z Values: Minimum = 0.0000000, Default = 0.2800000, Maximum = 1.0000000
+2026-10-24T03:56:22.8430480Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8430810Z   -parameter PASS
+2026-10-24T03:56:22.8430910Z 
+2026-10-24T03:56:22.8430970Z Parameter ID:1564195625
+2026-10-24T03:56:22.8431140Z Name: Chamber
+2026-10-24T03:56:22.8431300Z Parameter Type: Indexed
+2026-10-24T03:56:22.8431610Z Values: Minimum = Forgotten Chapel, Default = Ancient Cathedral, Maximum = Endless Void
+2026-10-24T03:56:22.8432070Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8432370Z Parameter has Value Strings
+2026-10-24T03:56:22.8432560Z Num Strings = 4
+2026-10-24T03:56:22.8432730Z Value: 0,  String: Forgotten Chapel
+2026-10-24T03:56:22.8432940Z Value: 1,  String: Ancient Cathedral
+2026-10-24T03:56:22.8433160Z Value: 2,  String: Underground Crypt
+2026-10-24T03:56:22.8433370Z Value: 3,  String: Endless Void
+2026-10-24T03:56:22.8433560Z   -parameter PASS
+2026-10-24T03:56:22.8433670Z 
+2026-10-24T03:56:22.8433730Z Parameter ID:1678364350
+2026-10-24T03:56:22.8433890Z Name: Time Sync
+2026-10-24T03:56:22.8434040Z Parameter Type: Indexed
+2026-10-24T03:56:22.8434270Z Values: Minimum = Free, Default = Free, Maximum = 1/2
+2026-10-24T03:56:22.8434610Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8434920Z Parameter has Value Strings
+2026-10-24T03:56:22.8435110Z Num Strings = 5
+2026-10-24T03:56:22.8435280Z Value: 0,  String: Free
+2026-10-24T03:56:22.8435540Z Value: 1,  String: 1/8
+2026-10-24T03:56:22.8435710Z Value: 2,  String: 1/4
+2026-10-24T03:56:22.8435870Z Value: 3,  String: Dotted 1/4
+2026-10-24T03:56:22.8436080Z Value: 4,  String: 1/2
+2026-10-24T03:56:22.8436240Z   -parameter PASS
+2026-10-24T03:56:22.8436370Z 
+2026-10-24T03:56:22.8436460Z Parameter ID:1678378736
+2026-10-24T03:56:22.8436750Z Name: Time
+2026-10-24T03:56:22.8436930Z Parameter Type: Generic
+2026-10-24T03:56:22.8437270Z Values: Minimum = 20.0000000, Default = 439.9999695, Maximum = 2000.0000000
+2026-10-24T03:56:22.8438290Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8439890Z WARNING: retrievedValue = 0.460566 (was 0.460566), Parameter did not retain default value when set
+2026-10-24T03:56:22.8440340Z   -parameter PASS
+2026-10-24T03:56:22.8440470Z 
+2026-10-24T03:56:22.8440680Z Parameter ID:1706566249
+2026-10-24T03:56:22.8440920Z Name: Input
+2026-10-24T03:56:22.8441090Z Parameter Type: Generic
+2026-10-24T03:56:22.8441490Z Values: Minimum = -24.0000000, Default = 0.0000000, Maximum = 24.0000000
+2026-10-24T03:56:22.8442050Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8442510Z   -parameter PASS
+2026-10-24T03:56:22.8442630Z 
+2026-10-24T03:56:22.8443070Z Parameter ID:1741803213
+2026-10-24T03:56:22.8443340Z Name: Darkness
+2026-10-24T03:56:22.8443480Z Parameter Type: Generic
+2026-10-24T03:56:22.8443820Z Values: Minimum = 0.0000000, Default = 0.3000000, Maximum = 1.0000000
+2026-10-24T03:56:22.8444310Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8444760Z   -parameter PASS
+2026-10-24T03:56:22.8445320Z 
+2026-10-24T03:56:22.8445400Z Parameter ID:1842231367
+2026-10-24T03:56:22.8445570Z Name: Movement
+2026-10-24T03:56:22.8445720Z Parameter Type: Generic
+2026-10-24T03:56:22.8446320Z Values: Minimum = 0.0000000, Default = 0.1200000, Maximum = 1.0000000
+2026-10-24T03:56:22.8447350Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8447740Z   -parameter PASS
+2026-10-24T03:56:22.8447920Z 
+2026-10-24T03:56:22.8448010Z Parameter ID:1855181860
+2026-10-24T03:56:22.8448220Z Name: Instability
+2026-10-24T03:56:22.8448410Z Parameter Type: Generic
+2026-10-24T03:56:22.8449600Z Values: Minimum = 0.0000000, Default = 0.0800000, Maximum = 1.0000000
+2026-10-24T03:56:22.8450140Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8450470Z   -parameter PASS
+2026-10-24T03:56:22.8450610Z 
+2026-10-24T03:56:22.8450710Z Parameter ID:1930558693
+2026-10-24T03:56:22.8450930Z Name: Wraith Mix
+2026-10-24T03:56:22.8451140Z Parameter Type: Generic
+2026-10-24T03:56:22.8451450Z Values: Minimum = 0.0000000, Default = 0.1600000, Maximum = 1.0000000
+2026-10-24T03:56:22.8451850Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8452200Z   -parameter PASS
+2026-10-24T03:56:22.8452290Z 
+2026-10-24T03:56:22.8452370Z Parameter ID:1955982213
+2026-10-24T03:56:22.8452520Z Name: Feedback
+2026-10-24T03:56:22.8452670Z Parameter Type: Generic
+2026-10-24T03:56:22.8452940Z Values: Minimum = 0.0000000, Default = 0.3800000, Maximum = 0.9000000
+2026-10-24T03:56:22.8453350Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8453730Z   -parameter PASS
+2026-10-24T03:56:22.8453830Z 
+2026-10-24T03:56:22.8453920Z Parameter ID:1990308917
+2026-10-24T03:56:22.8454120Z Name: Ritual Motion
+2026-10-24T03:56:22.8454330Z Parameter Type: Boolean
+2026-10-24T03:56:22.8454590Z Values: Minimum = Off, Default = Off, Maximum = On
+2026-10-24T03:56:22.8454930Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8455230Z   -parameter PASS
+2026-10-24T03:56:22.8455330Z 
+2026-10-24T03:56:22.8455400Z Parameter ID:2061464833
+2026-10-24T03:56:22.8455560Z Name: Shimmer
+2026-10-24T03:56:22.8455730Z Parameter Type: Generic
+2026-10-24T03:56:22.8456010Z Values: Minimum = 0.0000000, Default = 0.0800000, Maximum = 1.0000000
+2026-10-24T03:56:22.8456470Z Flags: Values Have Strings, High Resolution, Can Ramp, Readable, Writable 
+2026-10-24T03:56:22.8456840Z   -parameter PASS
+2026-10-24T03:56:22.8457000Z 
+2026-10-24T03:56:22.8457090Z Parameter ID:2126395769
+2026-10-24T03:56:22.8457270Z Name: Ancient Blood
+2026-10-24T03:56:22.8457470Z Parameter Type: Boolean
+2026-10-24T03:56:22.8457690Z Values: Minimum = Off, Default = On, Maximum = On
+2026-10-24T03:56:22.8458980Z Flags: Values Have Strings, High Resolution, Readable, Writable 
+2026-10-24T03:56:22.8459350Z   -parameter PASS
+2026-10-24T03:56:22.8459440Z 
+2026-10-24T03:56:22.8459800Z Testing that parameters retain value across reset and initialization
+2026-10-24T03:56:22.8460080Z   PASS
+2026-10-24T03:56:22.8460150Z 
+2026-10-24T03:56:22.8460200Z * * PASS
+2026-10-24T03:56:22.8460350Z --------------------------------------------------
+2026-10-24T03:56:22.8460570Z FORMAT TESTS:
+2026-10-24T03:56:22.8460640Z 
+2026-10-24T03:56:22.8460730Z Reported Channel Capabilities (explicit):
+2026-10-24T03:56:22.8460920Z       [1, 1]  [2, 2]  
+2026-10-24T03:56:22.8461010Z 
+2026-10-24T03:56:22.8461080Z Input/Output Channel Handling:
+2026-10-24T03:56:22.8461370Z 1-1   1-2   1-4   1-5   1-6   1-7   1-8   2-2   2-4   2-5   2-6   2-7   2-8   4-4   4-5   5-5   6-6   7-7   8-8
+2026-10-24T03:56:22.8461760Z X                                         X                                                                       
+2026-10-24T03:56:22.8461980Z 
+2026-10-24T03:56:22.8462060Z # # AudioChannelLayouts (5), Input Scope:
+2026-10-24T03:56:22.8462270Z ChannelLayout is Writable: T
+2026-10-24T03:56:22.8462480Z The Unit publishes the following Channel Layouts:
+2026-10-24T03:56:22.8462730Z   0x640001, 0x650002, 0x660002, 0x670002, 0x6A0002, 
+2026-10-24T03:56:22.8462890Z 
+2026-10-24T03:56:22.8462950Z Is Audio Channel Layout Available:
+2026-10-24T03:56:22.8463590Z Mono    Stereo  Binau.  AU_4    Ambi.   AU_5    AU_5_0  AU_6    AU_6_0  AU_7_0  AU_7_0F AU_8    AU_5_1  AU_6_1  AU_7_1  AU_7_1F 
+2026-10-24T03:56:22.8464050Z X       X       X                                                                                                               
+2026-10-24T03:56:22.8464270Z 
+2026-10-24T03:56:22.8464460Z Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+2026-10-24T03:56:22.8464970Z Current Format Tag = 0x650002, New Format Tag = 0x640001, Success - did not reset format with mis-matched layout
+2026-10-24T03:56:22.8465280Z 
+2026-10-24T03:56:22.8465470Z Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+2026-10-24T03:56:22.8465860Z Current Format Tag = 0x650002, New Format Tag = 0x650002, Successsful
+2026-10-24T03:56:22.8466070Z 
+2026-10-24T03:56:22.8466250Z Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+2026-10-24T03:56:22.8466640Z Current Format Tag = 0x650002, New Format Tag = 0x6A0002, Successsful
+2026-10-24T03:56:22.8466860Z 
+2026-10-24T03:56:22.8466930Z # # AudioChannelLayouts (5), Output Scope:
+2026-10-24T03:56:22.8467150Z ChannelLayout is Writable: T
+2026-10-24T03:56:22.8467350Z The Unit publishes the following Channel Layouts:
+2026-10-24T03:56:22.8467600Z   0x640001, 0x650002, 0x660002, 0x670002, 0x6A0002, 
+2026-10-24T03:56:22.8467750Z 
+2026-10-24T03:56:22.8467820Z Is Audio Channel Layout Available:
+2026-10-24T03:56:22.8468170Z Mono    Stereo  Binau.  AU_4    Ambi.   AU_5    AU_5_0  AU_6    AU_6_0  AU_7_0  AU_7_0F AU_8    AU_5_1  AU_6_1  AU_7_1  AU_7_1F 
+2026-10-24T03:56:22.8468610Z X       X       X                                                                                                               
+2026-10-24T03:56:22.8468840Z 
+2026-10-24T03:56:22.8469030Z Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+2026-10-24T03:56:22.8469580Z Current Format Tag = 0x650002, New Format Tag = 0x640001, Success - did not reset format with mis-matched layout
+2026-10-24T03:56:22.8469940Z 
+2026-10-24T03:56:22.8470120Z Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+2026-10-24T03:56:22.8470560Z Current Format Tag = 0x650002, New Format Tag = 0x650002, Successsful
+2026-10-24T03:56:22.8470790Z 
+2026-10-24T03:56:22.8470990Z Current Format:AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+2026-10-24T03:56:22.8471420Z Current Format Tag = 0x650002, New Format Tag = 0x6A0002, Successsful
+2026-10-24T03:56:22.8471650Z 
+2026-10-24T03:56:22.8471700Z * * PASS
+2026-10-24T03:56:22.8471870Z --------------------------------------------------
+2026-10-24T03:56:22.8472080Z RENDER TESTS:
+2026-10-24T03:56:22.8472160Z 
+2026-10-24T03:56:22.8472470Z Input Format: AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+2026-10-24T03:56:22.8472920Z Output Format: AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+2026-10-24T03:56:22.8473250Z Render Test at 512 frames
+2026-10-24T03:56:22.8473420Z Slicing Render Test at 64 frames
+2026-10-24T03:56:22.8473600Z   PASS
+2026-10-24T03:56:22.8473670Z 
+2026-10-24T03:56:22.8473670Z 
+2026-10-24T03:56:22.8473750Z Render Test at 64 frames, sample rate: 22050 Hz
+2026-10-24T03:56:22.8473990Z Render Test at 137 frames, sample rate: 96000 Hz
+2026-10-24T03:56:22.8474230Z Render Test at 4096 frames, sample rate: 48000 Hz
+2026-10-24T03:56:22.8474520Z Render Test at 4096 frames, sample rate: 192000 Hz
+2026-10-24T03:56:22.8495230Z Render Test at 4096 frames, sample rate: 11025 Hz
+2026-10-24T03:56:22.8520710Z Render Test at 512 frames, sample rate: 44100 Hz
+2026-10-24T03:56:22.8526770Z   PASS
+2026-10-24T03:56:22.8527040Z 
+2026-10-24T03:56:22.8527220Z 1 Channel Test:
+2026-10-24T03:56:22.8527630Z Render Test at 512 frames
+2026-10-24T03:56:22.8540840Z   PASS
+2026-10-24T03:56:22.8541540Z 
+2026-10-24T03:56:22.8541870Z Checking connection semantics:
+2026-10-24T03:56:22.8564450Z Connection format:
+2026-10-24T03:56:22.8571210Z AudioStreamBasicDescription:  2 ch,  44100 Hz, Float32, deinterleaved
+2026-10-24T03:56:22.8572430Z   PASS
+2026-10-24T03:56:22.8573400Z 
+2026-10-24T03:56:22.8573610Z Bad Max Frames - Render should fail
+2026-10-24T03:56:22.8574110Z   PASS
+2026-10-24T03:56:22.8574320Z 
+2026-10-24T03:56:22.8574500Z Checking parameter setting
+2026-10-24T03:56:22.8574980Z Using AudioUnitSetParameter
+2026-10-24T03:56:22.8575530Z Using AudioUnitScheduleParameter
+2026-10-24T03:56:22.8579810Z   PASS
+2026-10-24T03:56:22.8582020Z 
+2026-10-24T03:56:22.8584030Z Checking ramped parameter scheduling
+2026-10-24T03:56:22.8585140Z   PASS
+2026-10-24T03:56:22.8585690Z 
+2026-10-24T03:56:22.8586350Z Test MIDI
+2026-10-24T03:56:22.8586500Z   PASS
+2026-10-24T03:56:22.8586580Z 
+2026-10-24T03:56:22.8586630Z * * PASS
+2026-10-24T03:56:23.2242270Z --------------------------------------------------
+2026-10-24T03:56:23.2412020Z AU VALIDATION SUCCEEDED.
+2026-10-24T03:56:23.2515180Z --------------------------------------------------
+2026-10-24T03:56:23.2623340Z Apple auval exit code: 0
+2026-10-24T03:56:23.3356150Z ##[group]Run mkdir -p dist
+2026-10-24T03:56:23.3356430Z [36;1mmkdir -p dist[0m
+2026-10-24T03:56:23.3356630Z [36;1mfor format in AU VST3 Standalone; do[0m
+2026-10-24T03:56:23.3356850Z [36;1m  case "$format" in[0m
+2026-10-24T03:56:23.3357050Z [36;1m    AU) bundle=VEIL.component ;;[0m
+2026-10-24T03:56:23.3357270Z [36;1m    VST3) bundle=VEIL.vst3 ;;[0m
+2026-10-24T03:56:23.3357550Z [36;1m    Standalone) bundle=VEIL.app ;;[0m
+2026-10-24T03:56:23.3357780Z [36;1m  esac[0m
+2026-10-24T03:56:23.3358000Z [36;1m  source="build/VEIL_artefacts/Release/$format/$bundle"[0m
+2026-10-24T03:56:23.3358260Z [36;1m  if [[ -d "$source" ]]; then[0m
+2026-10-24T03:56:23.3358630Z [36;1m    ditto -c -k --sequesterRsrc --keepParent "$source" "dist/VEIL-macOS-arm64-$format.zip"[0m
+2026-10-24T03:56:23.3358980Z [36;1m  fi[0m
+2026-10-24T03:56:23.3359110Z [36;1mdone[0m
+2026-10-24T03:56:23.3488650Z shell: /bin/bash -e {0}
+2026-10-24T03:56:23.3488860Z ##[endgroup]
+2026-10-24T03:56:24.8185290Z ##[group]Run actions/upload-artifact@v4
+2026-10-24T03:56:24.8186050Z with:
+2026-10-24T03:56:24.8186510Z   name: VEIL-macOS-arm64-unsigned
+2026-10-24T03:56:24.8187150Z   path: dist/*.zip
+2026-10-24T03:56:24.8187600Z   if-no-files-found: warn
+2026-10-24T03:56:24.8188150Z   compression-level: 6
+2026-10-24T03:56:24.8188660Z   overwrite: false
+2026-10-24T03:56:24.8189110Z   include-hidden-files: false
+2026-10-24T03:56:24.8189640Z ##[endgroup]
+2026-10-24T03:56:25.6021290Z (node:4421) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-24T03:56:25.6023450Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-24T03:56:25.6104160Z With the provided path, there will be 3 files uploaded
+2026-10-24T03:56:25.6114320Z Artifact name is valid!
+2026-10-24T03:56:25.6115240Z Root directory input is valid!
+2026-10-24T03:56:25.9181230Z Beginning upload of artifact content to blob storage
+2026-10-24T03:56:26.2270290Z (node:4421) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-24T03:56:26.4785500Z Uploaded bytes 8388608
+2026-10-24T03:56:26.5155080Z Uploaded bytes 9464052
+2026-10-24T03:56:26.5346570Z Finished uploading artifact content to blob storage!
+2026-10-24T03:56:26.5448890Z SHA256 digest of uploaded artifact zip is 4481cfeabce7a062c032ad46c439199d7832aad5eb65213e08c8d91dfa41f7c7
+2026-10-24T03:56:26.5551260Z Finalizing artifact upload
+2026-10-24T03:56:26.8907070Z Artifact VEIL-macOS-arm64-unsigned.zip successfully finalized. Artifact ID 12547446199
+2026-10-24T03:56:26.8908960Z Artifact VEIL-macOS-arm64-unsigned has been successfully uploaded! Final size is 9464052 bytes. Artifact ID is 12547446199
+2026-10-24T03:56:26.8921920Z Artifact download URL: https://github.com/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40060059145/artifacts/12547446199
+2026-10-24T03:56:26.9126330Z ##[group]Run actions/upload-artifact@v4
+2026-10-24T03:56:26.9126560Z with:
+2026-10-24T03:56:26.9126850Z   name: VEIL-macOS-AU-diagnostics
+2026-10-24T03:56:26.9127270Z   path: build/au-validation/
+build/Testing/Temporary/LastTest.log
+
+2026-10-24T03:56:26.9127560Z   if-no-files-found: warn
+2026-10-24T03:56:26.9127790Z   compression-level: 6
+2026-10-24T03:56:26.9128030Z   overwrite: false
+2026-10-24T03:56:26.9128290Z   include-hidden-files: false
+2026-10-24T03:56:26.9128600Z ##[endgroup]
+2026-10-24T03:56:27.3525140Z (node:4436) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-24T03:56:27.3646860Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-24T03:56:27.4382900Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-10-24T03:56:27.4388720Z The least common ancestor is /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin/build. This will be the root directory of the artifact
+2026-10-24T03:56:27.4389670Z With the provided path, there will be 10 files uploaded
+2026-10-24T03:56:27.4390140Z Artifact name is valid!
+2026-10-24T03:56:27.4412150Z Root directory input is valid!
+2026-10-24T03:56:27.7007570Z (node:4436) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-24T03:56:27.7213190Z Beginning upload of artifact content to blob storage
+2026-10-24T03:56:27.7724620Z Uploaded bytes 7842
+2026-10-24T03:56:27.8025790Z Finished uploading artifact content to blob storage!
+2026-10-24T03:56:27.8127250Z SHA256 digest of uploaded artifact zip is 4c574a7d56af060c6b9002e271fa09b1ce1e5ac9a7c0f59ae8c6ccc36d6245e8
+2026-10-24T03:56:27.8204880Z Finalizing artifact upload
+2026-10-24T03:56:28.2070590Z Artifact VEIL-macOS-AU-diagnostics.zip successfully finalized. Artifact ID 12547480937
+2026-10-24T03:56:28.2095220Z Artifact VEIL-macOS-AU-diagnostics has been successfully uploaded! Final size is 7842 bytes. Artifact ID is 12547480937
+2026-10-24T03:56:28.2231700Z Artifact download URL: https://github.com/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40060059145/artifacts/12547480937
+2026-10-24T03:56:28.2643360Z Post job cleanup.
+2026-10-24T03:56:28.5769510Z [command]/opt/homebrew/bin/git version
+2026-10-24T03:56:28.6018190Z git version 2.55.0
+2026-10-24T03:56:28.6062480Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/4cbf4b02-cfe9-466f-8d70-f1eceff700dd/.gitconfig'
+2026-10-24T03:56:28.6185310Z Temporarily overriding HOME='/Users/runner/work/_temp/4cbf4b02-cfe9-466f-8d70-f1eceff700dd' before making global git config changes
+2026-10-24T03:56:28.6191130Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-24T03:56:28.6309890Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/Dark-Fantasy-Plugin/Dark-Fantasy-Plugin
+2026-10-24T03:56:28.8364440Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-24T03:56:28.8677480Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-24T03:56:29.0096940Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-24T03:56:29.0155720Z http.https://github.com/.extraheader
+2026-10-24T03:56:29.0163300Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-24T03:56:29.0280190Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-24T03:56:29.1296470Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-24T03:56:29.1356130Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-24T03:56:29.3152670Z Cleaning up orphan processes
+2026-10-24T03:56:32.5128580Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
