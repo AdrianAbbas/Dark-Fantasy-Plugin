@@ -65,13 +65,27 @@ strict=""  # becomes -strict when this auval supports it
 /usr/bin/auval -h 2>&1 | /usr/bin/grep -qE -- '(^|[[:space:]])-strict([[:space:]]|$)' && strict="-strict"
 # shellcheck disable=SC2086  # $strict is empty or one flag
 run_check auval-arm64 /usr/bin/arch -arm64 /usr/bin/auval $strict -v aufx Vel1 Veil
-# One process per hosting route, so a crash in one cannot hide the others.
-suites="v2-oop auaudiounit v2-inproc"
+# Diagnostic run: reported in the logs, never fails the build.
+run_diagnostic() {
+    local name="$1"; shift
+    set +e
+    limit 600 "$@" > "$logs/$name.txt" 2>&1
+    local code=$?
+    set -e
+    echo "$name (diagnostic, not a gate): exit $code"
+}
+# One process per hosting route, so a crash in one cannot hide the others. The
+# brief's routes (AUv2 API out-of-process and in-process) are gates. The AUAudioUnit
+# route is diagnostic only: as driven by the harness it gives silence/-10876 for
+# Apple's own AULowpass too (see docs/DEVLOG.md), so it cannot judge VEIL yet.
+suites="v2-oop v2-inproc"
 for suite in $suites; do run_check "harness-arm64-$suite" /usr/bin/arch -arm64 "$harness" --strict --only "$suite"; done
+run_diagnostic harness-arm64-auaudiounit /usr/bin/arch -arm64 "$harness" --only auaudiounit
 if /usr/bin/arch -x86_64 /usr/bin/true 2>/dev/null; then
     # shellcheck disable=SC2086
     run_check auval-x86_64 /usr/bin/arch -x86_64 /usr/bin/auval $strict -v aufx Vel1 Veil
     for suite in $suites; do run_check "harness-x86_64-$suite" /usr/bin/arch -x86_64 "$harness" --strict --only "$suite"; done
+    run_diagnostic harness-x86_64-auaudiounit /usr/bin/arch -x86_64 "$harness" --only auaudiounit
 else
     echo "::error::Rosetta unavailable: the x86_64 slice was not validated"; status=1
 fi

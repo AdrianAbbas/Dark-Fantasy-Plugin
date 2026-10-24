@@ -212,9 +212,13 @@ The chain, from the report's system log:
 - **Harness, per hosting route** (`e606993`):
   - v2 in-process: 49/49 on arm64 and x86_64. Covers sound, bypass, parameters, all presets, state, 44.1/96 kHz, mono→mono, mono→stereo, and the Cocoa editor created and kept alive in a window.
   - v2 out-of-process: 47/47 on arm64. Same coverage, plus the **remote editor view** delivered with a sensible size.
-- **Open (harness side, being fixed):**
-  - an intermittent trap in the harness process while reconfiguring an out-of-process instance (seen once on arm64, once on x86_64);
-  - the AUAudioUnit route returning exact zeros even in bypass, which means the remote side got silent input.
+- **Harness trap, fixed (`402cd81`).** The crash report showed the trap inside AudioToolbox:
+  `AudioUnitUninitialize` → `-[AUAudioUnit_XPC internalDeallocateRenderResources]` → `~RenderPipeUser` → `caulk::semaphore::~semaphore()` → `EXC_BREAKPOINT`.
+  Apple's out-of-process render pipe was torn down while in use, after the harness rendered flat out from the main thread with no host time and uninitialised immediately. With host-like timing (one block per block-duration, host time set, a pause before teardown) both architectures pass: **v2 out-of-process 47/47** and **v2 in-process 49/49**, on arm64 and x86_64.
+- **AUAudioUnit route: diagnostic, not a gate.** Through `AUAudioUnit instantiateWithComponentDescription: … LoadOutOfProcess` (class `AUAudioUnit_RemoteV2`), VEIL returns exact zeros even in bypass, with valid input buffers. The old 8.0.6 build behaves the same.
+  - **Control:** Apple's own AULowpass through the same harness route fails too: status −10876 (`kAudioUnitErr_NoConnection`) and silence.
+  - So the harness does not yet drive this route correctly, and it cannot judge VEIL. It keeps running and is reported in CI, but does not fail the build.
+  - The brief's required routes (AUv2 API in-process and out-of-process, §7.2) are the gates. Making this route work, with the Apple control as its reference, is follow-up work.
 - **GarageBand on the user's Mac:** pending (Milestone 1 gate).
 
 ---
