@@ -197,6 +197,8 @@ void Echoes::process(float& left, float& right, const Frame& p, float bpm) noexc
         delay[c].push(std::clamp(dry[c] * on + feedback * loop, -8.0f, 8.0f));
     }
     const float mix = clamp01(p[DelayMix]) * on;
-    left = lerp(dry[0], echoes[0], mix); right = lerp(dry[1], echoes[1], mix);
+    // Equal power: the echoes are uncorrelated with the dry signal.
+    const float dryGain = std::sqrt(1.0f - mix), wetGain = std::sqrt(mix);
+    left = dry[0] * dryGain + echoes[0] * wetGain; right = dry[1] * dryGain + echoes[1] * wetGain;
 }
 }

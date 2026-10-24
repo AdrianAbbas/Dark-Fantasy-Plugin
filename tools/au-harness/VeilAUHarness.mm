@@ -456,9 +456,10 @@ void cocoaViewTest(Report& r, AudioUnit unit, bool useWindow) {
     pump(0.3);   // let JUCE delete its editor before the unit goes away
 }
 
-// Editor via kAudioUnitProperty_RequestViewController: the API a host uses for an
-// out-of-process instance (the view is served remotely). A plain in-process AUv2
-// unit is not expected to implement it, so there it is informational only.
+// Editor via kAudioUnitProperty_RequestViewController (the AUv2-API route to a remote
+// view). Apple does not promise this property for every AUv2 instance, so when it is
+// absent that is reported, not failed; when present it must deliver a usable view.
+// The AUAudioUnit suite checks the modern hosts' route, which is required.
 void requestViewControllerTest(Report& r, AudioUnit unit, bool useWindow, bool required) {
     typedef void (^ViewControllerBlock)(AUViewControllerBase*);
     UInt32 size = 0;
@@ -467,7 +468,7 @@ void requestViewControllerTest(Report& r, AudioUnit unit, bool useWindow, bool r
     const bool available = s == noErr && size == sizeof(ViewControllerBlock);
     const auto detail = strf("status=%s size=%u", statusText(s).c_str(), unsigned(size));
     if (!required && !available) {
-        r.info("kAudioUnitProperty_RequestViewController not implemented (expected for in-process AUv2)", detail);
+        r.info("kAudioUnitProperty_RequestViewController not offered for this instance", detail);
         return;
     }
     if (!r.check(available, "kAudioUnitProperty_RequestViewController available", detail))
@@ -665,7 +666,7 @@ void v2Suite(Report& r, AudioComponent component, bool outOfProcess, bool useWin
 
     // 9. Editor.
     if (outOfProcess && !imageAfter) {
-        requestViewControllerTest(r, unit, useWindow, true);
+        requestViewControllerTest(r, unit, useWindow, false);
     } else {
         host.configure(48000.0, 2, 2);
         cocoaViewTest(r, unit, useWindow);

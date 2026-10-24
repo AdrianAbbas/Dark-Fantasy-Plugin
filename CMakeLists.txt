@@ -1,16 +1,23 @@
 cmake_minimum_required(VERSION 3.22)
+# macOS defaults: one universal binary that loads on Apple Silicon and Intel Macs
+# back to 10.15. These must be set before project(); override on the command line.
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Target architectures")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum macOS version")
+endif()
 project(VEIL VERSION 1.0.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 option(VEIL_BUILD_TESTS "Build offline DSP and processor regression tests" ON)
-set(JUCE_PATH "" CACHE PATH "Existing JUCE 8.0.6 source (otherwise fetched)")
+set(JUCE_PATH "" CACHE PATH "Existing JUCE 8.0.16 source (otherwise fetched)")
 if(JUCE_PATH)
     add_subdirectory("${JUCE_PATH}" "${CMAKE_BINARY_DIR}/JUCE" EXCLUDE_FROM_ALL)
 else()
     include(FetchContent)
     FetchContent_Declare(JUCE GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-        GIT_TAG 51a8a6d7aeae7326956d747737ccf1575e61e209 GIT_SHALLOW FALSE)
+        GIT_TAG ea77444750de45e036e0279bb0291144bf8e3688 # JUCE 8.0.16
+        GIT_SHALLOW FALSE)
     FetchContent_MakeAvailable(JUCE)
 endif()
 set(VEIL_FORMATS VST3 Standalone)
@@ -32,6 +39,9 @@ juce_add_plugin(VEIL
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     VST3_CATEGORIES Fx Reverb Delay
     AU_MAIN_TYPE kAudioUnitType_Effect
+    # Lets sandboxed hosts (GarageBand) load VEIL in-process. VEIL must still work
+    # out-of-process, which the AU host harness checks.
+    AU_SANDBOX_SAFE TRUE
     COPY_PLUGIN_AFTER_BUILD FALSE)
 target_sources(VEIL PRIVATE
     Source/PluginProcessor.cpp Source/PluginEditor.cpp

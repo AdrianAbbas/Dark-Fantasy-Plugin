@@ -9,6 +9,13 @@ constexpr double pi=std::numbers::pi;
 float safe(float v) noexcept { return std::isfinite(v) ? v : 0.0f; }
 float pole(double hz, double sr) noexcept { return static_cast<float>(1.0-std::exp(-2.0*pi*hz/sr)); }
 float mix(float a,float b,float m) noexcept { return a+(b-a)*std::clamp(m,0.0f,1.0f); }
+// Equal-power blend for wet layers that are uncorrelated with the dry signal
+// (reverb, granular, pitch-shifted). A linear crossfade loses up to 3 dB there.
+// Exact at m = 0 (dry) and m = 1 (wet).
+float blend(float dry,float wet,float m) noexcept {
+    m=std::clamp(m,0.0f,1.0f);
+    return dry*std::sqrt(1.0f-m)+wet*std::sqrt(m);
+}
 float bounded(float x) noexcept { return x / (1.0f + std::abs(x)*.02f); }
 }
 namespace spatial {
@@ -150,7 +157,7 @@ void Crypt::process(float& l,float& r,const Frame& p,float) noexcept {
     const float mid=(wetL+wetR)*.5f, side=(wetL-wetR)*.5f*width;
     wetL=mid+side; wetR=mid-side;
     const float amount=p[CryptOn]*p[ReverbMix];
-    l=mix(dryL,wetL,amount); r=mix(dryR,wetR,amount);
+    l=blend(dryL,wetL,amount); r=blend(dryR,wetR,amount);
 }
 
 void Wraith::prepare(double sampleRate) {
@@ -197,7 +204,7 @@ void Wraith::process(float& l,float& r,const Frame& p,float) noexcept {
     wetSmooth[0]+=wetCoefficient*(wetL-wetSmooth[0]);
     wetSmooth[1]+=wetCoefficient*(wetR-wetSmooth[1]);
     const float amount=p[WraithOn]*p[WraithMix];
-    l=mix(dryL,wetSmooth[0],amount); r=mix(dryR,wetSmooth[1],amount);
+    l=blend(dryL,wetSmooth[0],amount); r=blend(dryR,wetSmooth[1],amount);
 }
 
 void Choir::prepare(double sampleRate) {
@@ -254,6 +261,6 @@ void Choir::process(float& l,float& r,const Frame& p,float) noexcept {
     wetL=mix(wetL,vowelL,.35f+formantAmount*.5f);
     wetR=mix(wetR,vowelR,.35f+formantAmount*.5f);
     const float amount=p[ChoirOn]*p[ChoirBlend];
-    l=mix(dryL,wetL,amount); r=mix(dryR,wetR,amount);
+    l=blend(dryL,wetL,amount); r=blend(dryR,wetR,amount);
 }
 }

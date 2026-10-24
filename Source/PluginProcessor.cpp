@@ -55,8 +55,12 @@ void VeilAudioProcessor::reset() {
     inputLevel=0; outputLevel=0;
 }
 bool VeilAudioProcessor::isBusesLayoutSupported(const BusesLayout& layout) const {
+    // mono->mono, stereo->stereo and mono->stereo (Logic offers it on mono tracks).
     const auto in=layout.getMainInputChannelSet(), out=layout.getMainOutputChannelSet();
-    return in==out && (in==juce::AudioChannelSet::mono() || in==juce::AudioChannelSet::stereo());
+    const auto monoOrStereo=[](const juce::AudioChannelSet& set) {
+        return set==juce::AudioChannelSet::mono() || set==juce::AudioChannelSet::stereo();
+    };
+    return monoOrStereo(in) && monoOrStereo(out) && in.size()<=out.size();
 }
 void VeilAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,juce::MidiBuffer&) { process(buffer,false); }
 void VeilAudioProcessor::processBlockBypassed(juce::AudioBuffer<float>& buffer,juce::MidiBuffer&) { process(buffer,true); }
@@ -68,12 +72,17 @@ void VeilAudioProcessor::process(juce::AudioBuffer<float>& buffer,bool forcedByp
     float bpm=120;
     if (auto* ph=getPlayHead()) if (auto pos=ph->getPosition()) if (auto tempo=pos->getBpm())
         if (std::isfinite(*tempo)) bpm=static_cast<float>(juce::jlimit(20.0,400.0,*tempo));
-    const int channels=juce::jmin(buffer.getNumChannels(),getTotalNumInputChannels());
-    for (int ch=channels;ch<buffer.getNumChannels();++ch) buffer.clear(ch,0,buffer.getNumSamples());
-    if (channels<1) return;
+    // Inputs and outputs are counted separately: with mono->stereo the right output
+    // carries no input and must still be written.
+    const int bufferChannels=buffer.getNumChannels();
+    const int inputs=juce::jmin(bufferChannels,getTotalNumInputChannels());
+    const int outputs=juce::jmin(bufferChannels,getTotalNumOutputChannels());
+    for (int ch=inputs;ch<bufferChannels;++ch) buffer.clear(ch,0,buffer.getNumSamples());
+    if (inputs<1 || outputs<1) return;
     float inPeak=0,outPeak=0;
     auto* left=buffer.getWritePointer(0);
-    auto* right=channels>1 ? buffer.getWritePointer(1) : nullptr;
+    auto* right=outputs>1 ? buffer.getWritePointer(1) : nullptr;
+    const bool stereoInput=inputs>1;
     for (int n=0;n<buffer.getNumSamples();++n) {
         for (std::size_t i=0;i<veil::Count;++i) {
             // Choices are discrete. Enable/bypass parameters fade over 25 ms.
@@ -83,7 +92,7 @@ void VeilAudioProcessor::process(juce::AudioBuffer<float>& buffer,bool forcedByp
         }
         const auto p=ritual.process(smoothed,bpm);
         const float dryL=std::isfinite(left[n]) ? juce::jlimit(-32.0f,32.0f,left[n]) : 0;
-        const float dryR=right ? (std::isfinite(right[n]) ? juce::jlimit(-32.0f,32.0f,right[n]) : 0) : dryL;
+        const float dryR=stereoInput ? (std::isfinite(right[n]) ? juce::jlimit(-32.0f,32.0f,right[n]) : 0) : dryL;
         inPeak=juce::jmax(inPeak,std::abs(dryL),std::abs(dryR));
         const float inGain=std::pow(10.0f,p[veil::InputGain]*.05f);
         float l=dryL*inGain, r=dryR*inGain;

@@ -1,0 +1,34 @@
+VEIL - Dark Fantasy Processor (macOS, Apple Silicon and Intel, macOS 10.15+)
+
+INSTALL
+  1. Quit GarageBand and Logic.
+  2. Open Terminal (Applications > Utilities > Terminal).
+  3. Type "bash " (with a space), drag install-mac.sh from this folder into the
+     Terminal window, and press Return.
+  4. Wait for "VEIL is installed and validated."
+
+  Why a script? This build is not signed with an Apple Developer ID. When a browser
+  downloads it, macOS marks every file as quarantined and then refuses to load the
+  plug-in: GarageBand shows a silent slot with plain sliders. The script removes that
+  flag, re-signs the plug-in for this Mac, refreshes the Audio Unit list and runs
+  Apple's validator.
+
+GARAGEBAND
+  Settings > Audio/MIDI: tick "Audio Units". Restart GarageBand.
+  Track > Smart Controls (B) > Plug-ins > empty slot > Audio Units > Veil Audio > VEIL.
+  If you see sliders instead of the VEIL interface, switch the plug-in window's view
+  menu from "Controls" to "Editor".
+
+LOGIC PRO
+  Settings > Plug-in Manager > Veil Audio > VEIL. If it is marked failed, select it
+  and click "Reset & Rescan Selection". Insert from an Audio FX slot.
+
+UNINSTALL
+  bash uninstall-mac.sh            (add --purge to also delete saved presets)
+
+MANUAL INSTALL (if you prefer not to run the script)
+  cp -R VEIL.component ~/Library/Audio/Plug-Ins/Components/
+  xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/Components/VEIL.component
+  codesign --force --deep --sign - ~/Library/Audio/Plug-Ins/Components/VEIL.component
+  killall -9 AudioComponentRegistrar
+  auval -v aufx Vel1 Veil

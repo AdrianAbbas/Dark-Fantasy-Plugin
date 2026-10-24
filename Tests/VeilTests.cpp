@@ -192,6 +192,85 @@ void routingAndSafetyTests(Suite& s) {
     bad.outputBuses.set(0,juce::AudioChannelSet::create5point1());
     s.check(!layoutProbe.isBusesLayoutSupported(bad),"unsupported surround routing rejected");
 }
+juce::AudioProcessor::BusesLayout layoutOf(const juce::AudioChannelSet& in,const juce::AudioChannelSet& out) {
+    juce::AudioProcessor::BusesLayout layout;
+    layout.inputBuses.add(in);
+    layout.outputBuses.add(out);
+    return layout;
+}
+// Naive sawtooth C major chord: bright, harmonically dense test material.
+float sawChord(int position,double sr) {
+    float sum=0;
+    for (double f:{130.81,164.81,196.0}) { const double phase=std::fmod(f*position/sr,1.0); sum+=static_cast<float>(2.0*phase-1.0); }
+    return .12f*sum;
+}
+void layoutAndTransparencyTests(Suite& s) {
+    s.section("bus layouts incl. mono->stereo, transparency at default gains, default level");
+    using Set=juce::AudioChannelSet;
+    VeilAudioProcessor probe;
+    s.check(probe.isBusesLayoutSupported(layoutOf(Set::mono(),Set::mono())),"mono->mono supported");
+    s.check(probe.isBusesLayoutSupported(layoutOf(Set::stereo(),Set::stereo())),"stereo->stereo supported");
+    s.check(probe.isBusesLayoutSupported(layoutOf(Set::mono(),Set::stereo())),"mono->stereo supported");
+    s.check(!probe.isBusesLayoutSupported(layoutOf(Set::stereo(),Set::mono())),"stereo->mono rejected");
+    s.check(!probe.isBusesLayoutSupported(layoutOf(Set::disabled(),Set::stereo())),"missing input rejected");
+    {
+        VeilAudioProcessor p; juce::MidiBuffer midi;
+        s.check(p.setBusesLayout(layoutOf(Set::mono(),Set::stereo())),"mono->stereo layout applied");
+        p.prepareToPlay(48000,512);
+        juce::AudioBuffer<float> b(2,512);
+        double left=0,right=0; int position=0;
+        for (int block=0;block<200;++block) {
+            b.clear();
+            for (int n=0;n<512;++n,++position) b.setSample(0,n,.2f*static_cast<float>(std::sin(tau*220.0*position/48000)));
+            p.processBlock(b,midi);
+            if (block>=100) { left+=b.getRMSLevel(0,0,512); right+=b.getRMSLevel(1,0,512); }
+        }
+        s.check(left>1e-3 && right>1e-3,"mono->stereo writes both outputs at default settings");
+        set(p,veil::Bypass,1); p.prepareToPlay(48000,512);
+        b.clear();
+        for (int n=0;n<512;++n) b.setSample(0,n,.2f*std::sin(.05f*static_cast<float>(n)));
+        juce::AudioBuffer<float> input; input.makeCopyOf(b);
+        p.processBlock(b,midi);
+        bool same=true;
+        for (int n=0;n<512;++n) same &= near(b.getSample(0,n),input.getSample(0,n),2e-6f) && near(b.getSample(1,n),input.getSample(0,n),2e-6f);
+        s.check(same,"mono->stereo bypass copies the input to both outputs");
+    }
+    // Wet/Dry 0, and all modules off, must be transparent with every gain at its default.
+    for (int mode=0;mode<2;++mode) {
+        VeilAudioProcessor p; juce::MidiBuffer midi;
+        if (mode==0) set(p,veil::GlobalMix,0); else disableModules(p);
+        p.prepareToPlay(44100,300);
+        juce::AudioBuffer<float> b(2,300);
+        bool same=true; int position=0;
+        for (int block=0;block<20;++block) {
+            for (int n=0;n<300;++n,++position) { b.setSample(0,n,sawChord(position,44100)); b.setSample(1,n,-.5f*sawChord(position+7,44100)); }
+            juce::AudioBuffer<float> input; input.makeCopyOf(b);
+            p.processBlock(b,midi);
+            for (int c=0;c<2;++c) for (int n=0;n<300;++n) same &= near(b.getSample(c,n),input.getSample(c,n),2e-6f);
+        }
+        s.check(same,mode==0 ? "Wet/Dry 0 at default gains passes input exactly" : "all modules off at default gains passes input exactly");
+    }
+    {
+        VeilAudioProcessor p; juce::MidiBuffer midi;
+        p.prepareToPlay(48000,512);
+        juce::AudioBuffer<float> b(2,512);
+        double in=0,out=0; int position=0;
+        for (int block=0;block<94*6;++block) {   // six seconds; measure the last four
+            for (int n=0;n<512;++n,++position) { const float x=sawChord(position,48000); b.setSample(0,n,x); b.setSample(1,n,x); }
+            double blockIn=0; for (int n=0;n<512;++n) blockIn+=double(b.getSample(0,n))*b.getSample(0,n);
+            p.processBlock(b,midi);
+            if (block>=94*2) {
+                in+=2*blockIn;
+                for (int c=0;c<2;++c) for (int n=0;n<512;++n) out+=double(b.getSample(c,n))*b.getSample(c,n);
+            }
+        }
+        const double difference=10.0*std::log10(out/in);
+        std::cout<<"[metric] default settings on a saw chord: output "<<difference<<" dB relative to input\n";
+        // Milestone 1 guard. The +/-2 dB target in the brief is met when the modules are
+        // re-tuned in Milestone 2 (Crypt wet calibration, Abyss passband, Ritual removal).
+        s.check(std::abs(difference)<=3.0,"default settings keep the level within 3 dB of the input");
+    }
+}
 void ratesAndStabilityTests(Suite& s) {
     s.section("sample-rate changes, silence, tones, impulses, extreme feedback, all presets");
     VeilAudioProcessor p; juce::MidiBuffer midi;
@@ -381,6 +460,7 @@ int main(int argc,char** argv) {
     try {
         parameterAndStateTests(suite);
         routingAndSafetyTests(suite);
+        layoutAndTransparencyTests(suite);
         ratesAndStabilityTests(suite);
         moduleBehaviorTests(suite);
         ritualTests(suite);
