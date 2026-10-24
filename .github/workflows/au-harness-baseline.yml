@@ -1,0 +1,97 @@
+name: AU harness baseline (old builds)
+# Milestone 0 diagnosis. Runs the AudioToolbox host harness against the exact
+# AU bundles earlier CI runs published (kept on the ci/au-diagnostics branch),
+# so the GarageBand failure can be reproduced or ruled out by a test.
+# This job characterises old builds: harness checks are reported, not enforced.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - tools/au-harness/**
+      - scripts/build-au-harness.sh
+      - scripts/register-au.sh
+      - .github/workflows/au-harness-baseline.yml
+permissions:
+  contents: read
+jobs:
+  baseline:
+    runs-on: macos-14
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch the old artifacts kept on ci/au-diagnostics
+        run: |
+          git fetch --depth=1 origin ci/au-diagnostics
+          mkdir -p old/final old/linker-signed logs
+          # final-au: the artifact of the green run of main 05cc9e5 (bundle-sealed ad-hoc signature).
+          git show FETCH_HEAD:diagnostics/final-au/VEIL-macOS-arm64-AU.zip > old/final.zip
+          # verified-au: the artifact of run 4be77de (linker signature only, no sealed resources).
+          git show FETCH_HEAD:diagnostics/verified-au/VEIL-macOS-arm64-AU.zip > old/linker-signed.zip
+          ditto -x -k old/final.zip old/final
+          ditto -x -k old/linker-signed.zip old/linker-signed
+          for b in old/final/VEIL.component old/linker-signed/VEIL.component; do
+            echo "== $b"
+            lipo -archs "$b/Contents/MacOS/VEIL"
+            codesign -dv --verbose=2 "$b" 2>&1 | head -8 || true
+            codesign --verify --strict --verbose=2 "$b" 2>&1 || true
+          done | tee logs/old-bundles.txt
+      - name: Environment
+        run: |
+          {
+            sw_vers
+            uname -m
+            spctl --status || true
+            if /usr/bin/arch -x86_64 /usr/bin/true 2>/dev/null; then echo "rosetta: yes"; else echo "rosetta: no"; fi
+          } | tee logs/environment.txt
+      - name: Ensure Rosetta for the x86_64 runs
+        run: /usr/sbin/softwareupdate --install-rosetta --agree-to-license || true
+      - name: Build harness
+        run: bash scripts/build-au-harness.sh build/VeilAUHarness
+      - name: "Experiment A: green-run artifact as uploaded"
+        run: |
+          bash scripts/register-au.sh old/final/VEIL.component 2>&1 | tee logs/A-register.txt || true
+          ./build/VeilAUHarness 2>&1 | tee logs/A-final-arm64.txt || true
+          /usr/bin/arch -x86_64 ./build/VeilAUHarness 2>&1 | tee logs/A-final-x86_64.txt || true
+      - name: "Experiment B: same artifact carrying a browser-download quarantine flag"
+        run: |
+          installed="$HOME/Library/Audio/Plug-Ins/Components/VEIL.component"
+          flag="0083;$(printf '%x' "$(date +%s)");Safari;$(uuidgen)"
+          find "$installed" -exec xattr -w com.apple.quarantine "$flag" {} +
+          {
+            xattr -lr "$installed" | head -4
+            killall -9 AudioComponentRegistrar 2>/dev/null || true
+            sleep 3
+            auval -a 2>&1 | grep -i vel1 || echo "aufx Vel1 Veil not listed"
+          } 2>&1 | tee logs/B-quarantine.txt
+          ./build/VeilAUHarness 2>&1 | tee logs/B-quarantined-arm64.txt || true
+      - name: "Experiment C: earlier linker-signed artifact"
+        run: |
+          bash scripts/register-au.sh old/linker-signed/VEIL.component 2>&1 | tee logs/C-register.txt || true
+          ./build/VeilAUHarness 2>&1 | tee logs/C-linker-signed-arm64.txt || true
+      - name: "Experiment D: green-run artifact with sandboxSafe added to Info.plist"
+        run: |
+          rm -rf old/sandbox && mkdir -p old/sandbox && ditto old/final/VEIL.component old/sandbox/VEIL.component
+          plist=old/sandbox/VEIL.component/Contents/Info.plist
+          /usr/libexec/PlistBuddy -c "Delete :AudioComponents:0:resourceUsage" "$plist"
+          /usr/libexec/PlistBuddy -c "Add :AudioComponents:0:sandboxSafe bool true" "$plist"
+          codesign --force --sign - old/sandbox/VEIL.component
+          bash scripts/register-au.sh old/sandbox/VEIL.component 2>&1 | tee logs/D-register.txt || true
+          ./build/VeilAUHarness 2>&1 | tee logs/D-sandboxsafe-arm64.txt || true
+      - name: Collect crash reports and hosting-service log
+        if: always()
+        run: |
+          mkdir -p logs/crashes
+          find "$HOME/Library/Logs/DiagnosticReports" /Library/Logs/DiagnosticReports -type f -mmin -60 \
+            \( -iname '*AUHosting*' -o -iname '*VeilAUHarness*' -o -iname '*auval*' -o -iname '*AudioComponent*' \) \
+            -exec cp {} logs/crashes/ \; 2>/dev/null || true
+          log show --last 45m --style compact --predicate \
+            '(process BEGINSWITH "AUHostingService") OR (eventMessage CONTAINS[c] "Vel1") OR (eventMessage CONTAINS[c] "VEIL.component")' \
+            > logs/hosting-service.log 2>&1 || true
+      - name: Summary
+        if: always()
+        run: grep -H -E "^(FAIL|SUMMARY)" logs/*.txt || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: au-harness-baseline-logs
+          path: logs/

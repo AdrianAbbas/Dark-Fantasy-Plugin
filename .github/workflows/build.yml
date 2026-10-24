@@ -15,6 +15,16 @@ jobs:
         run: ctest --test-dir build --output-on-failure
       - name: Register and validate AU (arm64)
         run: bash scripts/validate-au-macos.sh
+      - name: Build AU host harness
+        if: always()
+        run: bash scripts/build-au-harness.sh build/VeilAUHarness
+      # Report-only during Milestone 0 diagnosis; becomes --strict (a hard gate) in Milestone 1.
+      - name: AU host harness, in-process and out-of-process (report only)
+        if: always()
+        run: |
+          mkdir -p build/au-harness
+          ./build/VeilAUHarness 2>&1 | tee build/au-harness/arm64.txt
+          /usr/bin/arch -x86_64 ./build/VeilAUHarness 2>&1 | tee build/au-harness/x86_64.txt || true
       - name: Package available macOS bundles
         if: always()
         run: |
@@ -44,6 +54,7 @@ jobs:
           name: VEIL-macOS-AU-diagnostics
           path: |
             build/au-validation/
+            build/au-harness/
             build/Testing/Temporary/LastTest.log
           if-no-files-found: warn
   linux:

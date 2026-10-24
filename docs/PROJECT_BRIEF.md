@@ -1,472 +1,387 @@
-# CODEX PROJECT BRIEF: VEIL — Dark Fantasy Audio Effects Plugin
+# VEIL — Dark Fantasy Audio Effect Plugin (Claude Code brief)
 
-You are an expert C++ audio DSP engineer, JUCE developer, and professional audio plugin UI/UX designer.
+You are a senior C++ audio DSP engineer and JUCE plugin developer with strong UI/UX taste. Build **VEIL**, a real, shippable Audio Unit effect plugin for **Logic Pro and GarageBand on macOS**, working on **both Apple Silicon and Intel Macs**.
 
-Your task is to design, implement, build, and test a fully functional audio effects plugin called **VEIL**, intended primarily for Logic Pro on macOS.
+VEIL turns ordinary synths, pads, pianos and guitars into dark, cinematic, haunted textures: gothic cathedrals, forgotten kingdoms, ritual magic, dungeon synth, dark ambient. All artwork must be original: no game names, logos or assets in the plugin itself.
 
-VEIL transforms ordinary synths, pads, pianos, guitars, and other audio sources into atmospheric, cinematic, haunting dark fantasy sounds.
+---
 
-The artistic direction is inspired by the atmosphere of Dark Souls, Elden Ring, Skyrim, Bloodborne, ancient medieval ruins, gothic cathedrals, forgotten kingdoms, ritual magic, and dark ambient soundtracks.
+## 0. HOW TO WORK (read first)
 
-This must be a REAL WORKING AUDIO PLUGIN, not a web application, interface mockup, or visual prototype.
+**Repository:** https://github.com/AdrianAbbas/Dark-Fantasy-Plugin
 
-## 1. TECHNICAL REQUIREMENTS
+A previous version exists in this repo. It builds, passes CI and passes `auval`. When it is inserted on a GarageBand software-instrument track on an Apple Silicon Mac, three things go wrong:
 
-Build the plugin using:
+1. The instrument goes completely silent.
+2. GarageBand shows only the generic AU parameter sliders, not the custom VEIL interface.
+3. Moving the controls changes nothing audible.
 
-- C++20, or C++17 if compatibility requires it
-- JUCE framework
-- CMake
-- Xcode/macOS toolchain
-- Audio Unit (AUv2) format for Logic Pro
-- VST3 format as an additional output if practical
-- Standalone application for testing if practical
-- Native macOS support, prioritizing Apple Silicon
-- Intel macOS compatibility if feasible
+The existing offline tests already show the processor producing sound from a sine input. So the likely cause is **how the plugin is built, signed, registered, installed or loaded by the host**, rather than the DSP math. Treat this as the top priority.
 
-The plugin should function as an audio effect inserted after existing software instruments, NOT as a separate synthesizer.
+**Rules for this project:**
 
-It must process incoming stereo or mono audio in real time.
+- **Audit first, then fix.** Read the whole repo before changing anything. Keep what is sound and rewrite what is weak or thin. You may restructure files freely. Keep the AU identity (`aufx` / `Vel1` / `Veil`) unless you find a concrete reason to change it, and document the reason if you do.
+- **Work in milestones with hard gates** (Section 2). Do not start a milestone until the previous gate passes. Commit at the end of each milestone with a clear message.
+- **Never claim something works that you have not verified.** "auval passed" does not mean "works in GarageBand". "Standalone shows the GUI" does not mean "the AU editor works". Say exactly what was tested, how, and what was not.
+- **Never "fix" a bug by hiding it.** Do not disable DSP, remove the editor, silence assertions or loosen tests to make them pass.
+- **Prefer a stable, great-sounding simpler algorithm over a broken ambitious one.**
+- If you are running on the user's Mac, build, install and validate locally. If you are running somewhere without macOS, use GitHub Actions (`gh run watch`, `gh run view --log-failed`) as the macOS build machine, and say clearly what could not be tested.
+- Keep a running `docs/DEVLOG.md` with decisions, bugs found, root causes and fixes.
 
-Requirements:
+---
 
-- Fully functional DSP, with every control affecting the sound
-- Sample-rate-independent processing
-- Smooth parameter changes without clicks
-- Logic Pro automation support
-- Host tempo synchronization where applicable
-- Preset saving and loading
-- Proper plugin state serialization
-- Adjustable wet/dry mix
-- Input and output gain controls
-- Global bypass
-- Low CPU consumption where practical
-- No real-time audio-thread allocations or locks
-- Silence-safe behavior and no NaN or infinite audio output
-- Stable operation at 44.1, 48, 88.2, and 96 kHz where feasible
+## 1. PLATFORM AND COMPATIBILITY REQUIREMENTS
 
-Use JUCE AudioProcessorValueTreeState or an equivalent robust parameter-management architecture.
+These are non-negotiable and come before any feature work.
 
-## 2. SOUND DESIGN MODULES
+### Build
 
-The plugin must contain six processing modules. Each module should have its own enable/disable switch, adjustable parameters, and a clearly recognizable sound.
+- JUCE 8.x (pin an exact tag or commit), CMake ≥ 3.22, C++20 (fall back to C++17 only if needed).
+- Formats: **AUv2** (primary), VST3 (secondary), Standalone (for development only).
+- **Universal binary:** `CMAKE_OSX_ARCHITECTURES="arm64;x86_64"`. Verify both slices with `lipo -archs` in CI and fail the build if either is missing.
+- **Deployment target:** macOS 10.15 or lower if JUCE allows, so older Intel MacBooks can load it. Document the minimum.
+- Plugin is an **effect** (`kAudioUnitType_Effect`, `IS_SYNTH FALSE`), inserted after an instrument.
 
-### MODULE I — THE ABYSS (Dark Filtering)
+### GarageBand / sandboxed-host compatibility
 
-Create a flexible tonal-shaping module for turning bright, modern synthesizers into darker, aged, mysterious instruments.
+GarageBand is a sandboxed host. It handles Audio Units differently from Logic and from `auval`. Investigate and handle all of the following:
 
-Controls:
+- **Sandbox-safe declaration.** Set `AU_SANDBOX_SAFE TRUE` in `juce_add_plugin` (adds `sandboxSafe` to the AudioComponents entry in Info.plist). Without it, sandboxed hosts may load the plugin out-of-process. Verify the key is present in the built Info.plist.
+- **Out-of-process loading.** The plugin must produce audio and show its editor **even when loaded out-of-process** (Logic can also do this, and Apple Silicon hosts do it for some plugins). Nothing may depend on being in the host's process.
+- **Channel layouts.** Support mono→mono, stereo→stereo **and mono→stereo**. Check what a GarageBand software-instrument track actually requests. Never leave output channels uncleared or unwritten.
+- **Editor.** `hasEditor()` returns true and `createEditor()` always succeeds. Editor construction must be cheap and must not throw, assert in release, block on file I/O, or depend on audio having been processed yet. Check that the AU exposes its Cocoa view (`kAudioUnitProperty_CocoaUI`) correctly in the built bundle.
+- **Bypass.** Host bypass (`kAudioUnitProperty_BypassEffect`, via `getBypassParameter()`) and VEIL's own bypass must both pass the dry signal.
+- **Factory presets** exposed as AU factory presets (`getNumPrograms` etc.), so GarageBand's and Logic's preset menus list them.
+- **State.** Saving and reopening a project restores every parameter.
 
-- Cutoff: adjustable low-pass frequency
-- Resonance: resonance around the cutoff
-- High-Pass: remove unwanted sub-bass
-- Slope: 12 dB/oct or 24 dB/oct
-- Darkness: macro controlling high-frequency attenuation and subtle spectral coloration
-- Movement: subtle modulated filtering
-- Movement Rate: free or tempo-synchronized modulation
+### Signing, quarantine and installation
 
-Include smooth filter automation and prevent unstable resonance.
+An unsigned plugin downloaded as a GitHub Actions artifact gets the `com.apple.quarantine` flag, and macOS may refuse to load its code even though the host still lists it. This is a strong suspect for the GarageBand failure.
 
-Sound goals: muffled medieval synthesizers, dark atmospheric pads, worn orchestral textures, distant instruments.
+- CI must **ad-hoc sign the whole bundle** (`codesign --force --deep --sign - VEIL.component`) and verify with `codesign --verify --strict --verbose=4`.
+- Provide **`scripts/install-mac.sh`** that the user runs after downloading. It must:
+  1. copy `VEIL.component` to `~/Library/Audio/Plug-Ins/Components/` (and `VEIL.vst3` to `~/Library/Audio/Plug-Ins/VST3/`),
+  2. remove quarantine: `xattr -dr com.apple.quarantine <bundle>`,
+  3. re-sign ad-hoc and verify,
+  4. reset the AU cache: `killall -9 AudioComponentRegistrar`,
+  5. run `auval -v aufx Vel1 Veil` and print a clear pass/fail,
+  6. print the next steps for GarageBand and Logic (Section 8).
+- Provide `scripts/uninstall-mac.sh`.
+- Document that proper distribution to other people needs a paid Apple Developer ID, signing with hardened runtime and notarization. Add an optional CI path for this that is skipped when signing secrets are absent.
 
-### MODULE II — THE CRYPT (Cathedral Reverb)
+### Real-time safety
 
-Create a dark, spacious, cinematic reverb engine.
+- No heap allocation, locks, file I/O, logging or `std::function` creation on the audio thread.
+- All buffers allocated in `prepareToPlay`. Correct re-initialisation on sample-rate or block-size change. Handle `numSamples == 0`, blocks larger than the prepared size, and any sample rate from 44.1 to 192 kHz.
+- Denormal protection, NaN/Inf guards per module (a failing module outputs silence for its wet path and resets itself; it never poisons the chain or the dry signal).
+- Thread-safe parameter access via `AudioProcessorValueTreeState` and atomics; GUI reads meters through atomics only.
+- Report latency accurately with `setLatencySamples`.
 
-The reverb should evoke ancient stone cathedrals, underground chambers, abandoned castles, crypts, and immense fantasy environments.
+---
 
-Controls:
+## 2. MILESTONES AND GATES
 
-- Space: room size
-- Decay: reverb tail duration
-- Pre-Delay
-- Damping: high-frequency decay
-- Low Cut: prevent muddy reverb
-- Shimmer: subtle upper-octave atmospheric component
-- Width: stereo spaciousness
-- Mix
+### Milestone 0 — Diagnose the GarageBand failure
 
-Provide selectable acoustic characters:
+1. Read the full repo. Write a short audit in `docs/DEVLOG.md`: architecture, what is solid, what is thin or wrong.
+2. List every plausible cause of "silent + generic UI in GarageBand", rank them, and test each. At minimum consider: sandbox-safe/out-of-process loading, quarantine and signature, AU registration cache, bus layout negotiation, editor construction failure, architecture mismatch, Info.plist contents, and the GarageBand plug-in window being set to its "Controls" view instead of "Editor".
+3. Build the **AU host test harness** (Section 7.2) before fixing anything, so the bug can be reproduced or ruled out by a test rather than guessed at.
 
-1. Forgotten Chapel
-2. Ancient Cathedral
-3. Underground Crypt
-4. Endless Void
+**Gate:** the root cause (or the top candidates, if it cannot be reproduced on CI) is documented with evidence.
 
-These must result in actual DSP differences, not merely renamed presets.
+### Milestone 1 — Transparent, loadable, visible
 
-A feedback delay network or similarly appropriate algorithm is acceptable. Keep feedback stable and bounded.
+Ship the smallest possible VEIL that is provably correct in a host:
 
-### MODULE III — THE WRAITH (Spectral Haunting)
+- All modules default to a state where the plugin is clearly audible but nothing breaks.
+- Bypass, wet/dry 0%, all modules disabled: output equals input (within float tolerance, after latency compensation).
+- Custom editor appears.
+- Universal binary, ad-hoc signed, install script, `auval` pass, harness pass both in-process and out-of-process.
 
-Design a spectral effect that creates ghostly, unstable, ethereal textures from incoming sound.
+**Gate:** CI green, harness green, and the user confirms on their Mac in GarageBand: sound passes, custom UI appears, bypass works. **Stop and ask the user to test before Milestone 2.** Give them exact, numbered steps.
 
-Controls:
+### Milestone 2 — DSP modules
 
-- Spectral Blur: smears and softens spectral detail
-- Detune: subtle pitch instability
-- Drift: slow modulation
-- Ghost: amount of delayed, pitch-altered spectral material
-- Freeze: captures and sustains a spectral texture
-- Mix
+Implement or upgrade the six modules (Section 3), one at a time, each with its own tests. Fixed signal order:
 
-The Freeze feature must hold a genuine processed audio texture, not simply mute the input or repeat a tiny unprocessed buffer.
+**Abyss → Ancient Blood → Choir → Wraith → [Haunting ghosts injected] → Echoes → Crypt**
 
-Use a suitably designed STFT, overlap-add, granular, or equivalent approach.
+(Tone shaping and saturation first, then pitch and spectral layers, then the ghosts, then time effects, with reverb last so tails are never re-distorted and ghosts sit inside the same space.)
 
-Handle windowing, phase behavior, and latency carefully.
+**Gate:** every module test passes, every control measurably changes the output, no module can silence the dry path.
 
-Sound goals: ghost choirs, haunted synthesizers, spectral drones, cursed ambience.
+### Milestone 3 — The Haunting (Section 4)
 
-### MODULE IV — ANCIENT BLOOD (Saturation and Degradation)
+**Gate:** Haunting tests pass (Section 7.1). On a recorded test phrase, ghosts appear, are audibly drawn from earlier material, stay in key with Harmony Lock at 100%, are repeatable with the same seed, and never raise output more than +1.5 dB above the level with Haunting off.
 
-Create a tasteful nonlinear processing module designed to make modern synths feel ancient, imperfect, and organic.
+### Milestone 4 — Custom interface (Section 5)
 
-Controls:
+**Gate:** editor opens in the AU harness and standalone, resizes cleanly, stays under ~5% CPU when idle on an M1/Intel i5 class machine, screenshots saved to `docs/`.
 
-- Drive
-- Texture: clean warmth to coarse distortion
-- Age: progressively reduced fidelity and softened high-frequency detail
-- Dust: subtle optional noise texture
-- Instability: randomized analog-style pitch/level movement
-- Mix
+### Milestone 5 — Presets, polish, docs, release
 
-Include anti-aliasing or oversampling where justified.
+**Gate:** all tests green, `auval` and `pluginval` (strictness 10) green, release artifact uploaded, README complete, user confirms the release in GarageBand and Logic.
 
-Avoid excessive noise or distortion at default values.
+---
 
-Sound goals: dusty ancient instruments, degraded magical artifacts, worn tape-like textures, gritty fantasy drones.
+## 3. SOUND DESIGN MODULES
 
-### MODULE V — THE ECHOES (Mystical Delay)
+Each module has: an on/off switch (switching crossfades over ~20 ms, no clicks), its own Mix where it makes sense, and smoothed parameters. Every control must have an audible, measurable effect.
 
-Build a musical delay engine capable of producing haunting, spatially distant repetitions.
+**Defaults matter.** With VEIL freshly inserted on a bright stock synth, it should already sound dark and atmospheric, but not mushy, distorted or quieter than the input. Tune defaults by ear-proxy tests (spectral centroid lower, RMS within ±2 dB of input, tail present).
 
-Controls:
+### I — THE ABYSS (dark filtering)
 
-- Time: milliseconds or host tempo synchronization
-- Feedback
-- Damping
-- Diffusion
-- Reverse: reverse-delay texture mode
-- Stereo Spread
-- Mix
+- Cutoff (low-pass), Resonance, High-Pass, Slope 12/24 dB, Darkness, Movement, Movement Rate (free Hz or tempo-synced divisions).
+- Use TPT/state-variable filters (e.g. `juce::dsp::StateVariableTPTFilter`, cascaded for 24 dB). Resonance must stay stable at any setting and never self-oscillate into loud whistling.
+- **Darkness** is a macro: lowers the effective cutoff, adds a gentle high-shelf cut and a slight low-mid warmth.
+- **Movement:** slow LFO on cutoff in octaves, smoothed.
 
-Reverse mode should use a buffered reverse-delay implementation with sensible behavior and clear latency or timing expectations.
+### II — THE CRYPT (cathedral reverb)
 
-Feedback must be stable and never produce uncontrolled volume growth.
+- Space, Decay, Pre-Delay, Damping, Low Cut, Shimmer, Width, Mix, Character.
+- 8- or 16-line **feedback delay network** with a Hadamard/Householder matrix, gentle delay-line modulation to avoid metallic ringing, input diffusion (all-pass chain), damping filters in the loop.
+- **Characters must differ in DSP, not just values:**
+  - *Forgotten Chapel:* short lines, bright early reflections, quick build.
+  - *Ancient Cathedral:* long lines, slow dense build, dark tail.
+  - *Underground Crypt:* strong low-mid resonance, heavy damping, close early reflections.
+  - *Endless Void:* very long decay, high modulation, extra diffusion, near-infinite tail capped safely.
+- **Shimmer:** octave-up pitch shift inside the feedback path with its own low gain and a limiter so it can never run away.
+- Feedback gain is always strictly below 1 after all processing.
 
-### MODULE VI — THE CHOIR (Phantom Harmonics)
+### III — THE WRAITH (spectral haunting)
 
-Create a spectral or pitch-based layer that turns an ordinary synth into something resembling a distant supernatural ensemble.
+- Spectral Blur, Detune, Drift, Ghost, Freeze, Mix.
+- STFT (e.g. 2048 FFT, 4× overlap, Hann analysis and synthesis windows, correct overlap-add normalisation).
+- **Blur:** smooth magnitudes across time and neighbouring bins. **Detune/Drift:** small, slowly modulated bin shifts or phase-vocoder pitch offsets. **Ghost:** a delayed, pitch-shifted copy of the spectral layer.
+- **Freeze:** captures the current magnitude spectrum and keeps resynthesising it with randomised, evolving phases, producing a sustained processed drone. It must keep sounding after input stops, fade in/out over ~100 ms when toggled, and never be a short looped buffer.
+- **Latency policy:** the Wraith is a wet-only layer. Its STFT delay is part of the effect, so the dry path stays at zero latency. Document this. Do not mix a near-identical delayed copy with the dry signal at equal levels (comb filtering).
 
-Controls:
+### IV — ANCIENT BLOOD (saturation and decay)
 
-- Voice Count: 1–4 additional voices
-- Interval: octave below, fifth, octave above, and other useful intervals
-- Detune
-- Formant Character
-- Movement
-- Blend
+- Drive, Texture, Age, Dust, Instability, Mix.
+- 2× or 4× oversampling around the nonlinearity (`juce::dsp::Oversampling`, allocated in `prepareToPlay`), with latency reported if it adds any.
+- **Texture** morphs between soft tape-like saturation and harder asymmetric clipping. Apply output compensation so Drive mostly changes tone, not loudness.
+- **Age:** progressive bandwidth reduction, gentle bit/sample-rate softening, slight wow.
+- **Dust:** sparse, filtered crackle and hiss. Off at default.
+- **Instability:** slow random pitch (wow/flutter) and level drift, smoothed.
 
-The purpose is not perfect realistic vocal synthesis. Instead, it should create an eerie choir-like harmonic character that blends with sustained input notes.
+### V — THE ECHOES (mystical delay)
 
-Use a genuine harmonizing or spectral approach. Do not mislabel a simple chorus as a pitch-shifting choir.
+- Time (ms or synced: 1/16, 1/8, 1/8 dotted, 1/4, 1/4 dotted, 1/2, 1 bar), Feedback, Damping, Diffusion, Reverse, Stereo Spread, Mix.
+- Smooth time changes (crossfade or slew, no zipper noise or pitch jumps on sync changes).
+- **Reverse:** buffered reverse delay using two overlapping, windowed read heads that play each captured segment backwards. Document the timing.
+- Feedback loop includes damping and a soft limiter; feedback can never grow without bound even at maximum.
 
-Design practical CPU and latency tradeoffs.
+### VI — THE CHOIR (phantom harmonics)
 
-## 3. UNIQUE FEATURE — THE RITUAL ENGINE
+- Voice Count (1–4), Interval (octave below, fifth below, fourth above, fifth above, octave above, octave+fifth), Detune, Formant Character, Movement, Blend.
+- **Real pitch shifting:** a granular (overlapping Hann grains) or phase-vocoder pitch shifter per voice. Each voice gets its own small detune and slow movement. A plain chorus is not acceptable.
+- **Formant Character:** a bank of 3–4 band-pass resonators morphing between vowel shapes (roughly "oo" → "oh" → "ah"), applied to the shifted voices to give a choir-like colour.
+- Voices are spread in stereo, lightly filtered and blended under the dry signal.
 
-This is the signature feature of VEIL and should be the most visually distinctive part of the interface.
+---
 
-Create a large interactive mystical sigil in the center of the plugin.
+## 4. THE HAUNTING (signature feature)
 
-The sigil functions as a two-dimensional sound-morphing interface.
+**VEIL remembers what you play, and haunts you with it.**
 
-Three points around the sigil represent three archetypes:
+Every other effect only processes the sound happening right now. VEIL keeps a memory of the last minute of your playing. While you play, fragments of earlier phrases come back as ghosts: reversed, slowed, pitched down, smeared and far away, retuned to fit what you're playing now. The longer you play, the more haunted the track becomes. No two performances sound the same, yet every ghost comes from your own music, so it always belongs to the song.
 
-**SHADOW**
-- Dark
-- Warm
-- Subdued
-- Subterranean
+This replaces any previous "Ritual Engine" or XY-morph feature in the repo. Remove those parameters, classes and UI completely.
 
-**SPIRIT**
-- Ethereal
-- Wide
-- Shimmering
-- Ghostly
+### 4.1 How it works
 
-**RUIN**
-- Degraded
-- Unstable
-- Distorted
-- Ancient
+**Memory (the Reliquary).**
+- Continuously record the input (after input gain, before any processing) into a circular stereo buffer, allocated in `prepareToPlay`.
+- Store at a fixed internal rate of at most 48 kHz (resample when the host runs higher) so memory stays reasonable: target ≤ ~25 MB per instance at the maximum length. 16-bit storage is acceptable.
+- Alongside the audio, store an analysis frame every ~20 ms: RMS level, onset flag, spectral centroid and a 12-bin **chroma** vector (pitch-class energy), computed with a preallocated FFT. Analysis must be real-time safe; amortise it across blocks or move it to a lock-free background worker.
+- Silence is never stored as a candidate fragment.
 
-The user drags a glowing orb inside a triangular ritual circle.
+**Fragment selection.**
+- When a ghost is due, choose a past fragment (0.5–4 s, starting near an onset) from the memory, excluding the most recent few seconds so ghosts are never just a delay.
+- **Harmony Lock:** compare the chroma of the current input with each candidate. Pick the best match and, if needed, transpose the fragment by the semitone rotation that best fits the current harmony (limited to ±7 semitones, preferring octaves, fifths and fourths). With Harmony Lock off, selection is random among non-silent fragments. Ghosts must never sound out of key against sustained input when Harmony Lock is high.
+- Bias selection by **Age**: from "recent memories" (last ~10 s) to "ancient memories" (the oldest part of the buffer).
 
-The orb's position continuously morphs the sound between these three archetypes.
+**Ghost voices.**
+- Up to 4 simultaneous ghosts. Each one is a granular player reading its fragment with:
+  - Direction: forward or reversed (probability set by **Transformation**).
+  - Pitch: Harmony Lock transposition plus optional octave down.
+  - Time stretch: 1× to 4× slower using overlapping Hann grains, so ghosts can become slow, smeared apparitions.
+  - Smear: random grain position jitter for a blurred, spectral quality.
+- Each ghost has a long, soft envelope (fade in and out over hundreds of milliseconds, never clicks), its own random stereo position and its own darkening filter set by **Distance**.
+- Ghosts are injected after the Wraith and before the Echoes and Crypt, so they sit in the same space as the rest of the sound and fade into the reverb.
 
-Technical requirements:
+**Possession.**
+- When ghosts are present, they gently possess the main sound. The live signal is subtly ducked, darkened (Abyss cutoff dips), and the Crypt grows larger and wetter. When the ghosts leave, everything returns.
+- This is applied as smoothed offsets on top of the user's settings, never replacing them. Setting Possession to 0 returns exactly to the manual settings.
+- Every knob being moved by Possession shows a thin secondary arc in the UI displaying its effective value.
 
-- Convert orb position to three normalized barycentric weights
-- Map these weights to carefully selected DSP parameters across multiple modules
-- Smooth all interpolated parameters
-- Avoid unexpected output-level spikes while morphing
-- Allow the Ritual Engine to be bypassed
-- Preserve sensible manual control over module parameters
-- Expose automatable X and Y coordinates to Logic Pro
-- Clearly indicate when a parameter is controlled by the Ritual Engine
+### 4.2 Controls
 
-The three archetypes should have distinctly different auditory characteristics.
+| Control | Range / options | What it does |
+|---|---|---|
+| Haunting On | on/off | Enables the whole feature (memory keeps recording when off, so turning it on mid-song works immediately) |
+| Presence | 0–100% | Level of the ghosts in the mix |
+| Frequency | rare → constant | How often ghosts appear; host-synced option spawns them on bar/beat divisions |
+| Memory | 4–60 s | How far back VEIL remembers |
+| Age | recent → ancient | Bias towards newer or older memories |
+| Harmony Lock | 0–100% | How strictly ghosts are matched and retuned to what you are playing now |
+| Transformation | 0–100% | Amount of reversing, slowing, octave-down and smearing |
+| Distance | near → far | How dark, quiet and reverberant the ghosts are |
+| Possession | 0–100% | How much ghost activity reshapes the main sound |
+| Seal | on/off | Stops recording new memories; ghosts keep coming from what is already stored |
+| Banish | momentary button | Clears the memory and fades out all ghosts |
+| Seed | integer | Random seed for repeatable results |
 
-Example:
+All continuous controls are automatable and smoothed.
 
-Near SHADOW, the sound becomes darker with subdued filtering and deep reverb.
+### 4.3 Bound relics
 
-Near SPIRIT, spectral effects, ethereal harmonics, width, and shimmer become more prominent.
+The user can **bind** up to 4 moments from memory as relics (by clicking on the memory ring in the UI, Section 5). Bound relics are copied to their own fixed buffers (up to 4 s each), are always eligible as ghosts, survive Banish, and are **saved with the project** in the plugin state (16-bit, capped size; document the size). A relic can be unbound by clicking it again.
 
-Near RUIN, saturation, degradation, instability, and distressed textures become stronger.
+### 4.4 Determinism and bouncing
 
-Also include a **RITUAL MOTION** feature.
+- All randomness comes from a seeded generator. On transport start, re-seed from Seed plus the transport position, so playing the same section from the same point gives the same ghosts, and an offline bounce matches playback when the memory contents match.
+- Document honestly: because ghosts come from what has been played, starting playback mid-song gives different ghosts than playing from the start (bound relics are the exception). Explain this in the README and recommend binding relics for parts that must stay identical.
+- With Haunting On but no input yet, the plugin behaves normally; there is no output from an empty memory.
 
-When enabled, the glowing orb can travel slowly through the triangle automatically.
+### 4.5 Safety
 
-Controls:
+- Ghost output passes through its own soft limiter and loudness control. At any setting, the ghost layer must never push total output more than +1.5 dB above the level it has with Haunting off (the Milestone 3 gate).
+- Memory allocation happens only in `prepareToPlay`; changing Memory length only changes the read window, it never reallocates on the audio thread.
+- Sample-rate changes rebuild the memory safely; relics are resampled.
 
-- Motion Rate
-- Motion Depth
-- Motion Pattern: Circle, Pendulum, Wander
-- Host Sync
-- Motion Enable
+---
 
-Wander should use smooth, bounded randomized movement, rather than abrupt parameter jumps.
+## 5. VISUAL DESIGN
 
-This feature should be genuinely useful for generating constantly evolving ambient soundscapes.
+The plugin should look like a premium, ancient magical artifact while staying as clear and precise as professional audio software.
 
-## 4. VISUAL DESIGN
+**Identity:** obsidian-black background; subtle procedurally generated stone or tarnished-metal texture; deep burgundy and muted bronze accents; antique-silver labels; thin gothic ornamental borders; arcane geometry. Restrained glow, no neon, no cartoon fantasy, no grey default JUCE look.
 
-The plugin should feel like a polished, premium fantasy artifact rather than conventional audio software.
+**Typography:** embed fonts via `BinaryData`, using only SIL Open Font License fonts (e.g. Cinzel for headings, Cormorant Garamond or EB Garamond for labels, a clean readable face for numbers). Include the licence files. Labels must be readable at 100% scale.
 
-Visual identity:
+**Layout (design at 1200×800; scale proportionally 75%–150%, fixed aspect ratio):**
 
-- Obsidian-black background
-- Subtle stone, parchment, or tarnished-metal textures
-- Deep burgundy and muted bronze accents
-- Antique silver labels
-- Thin ornamental gothic borders
-- Arcane geometric shapes and magical sigils
-- Soft animated glowing effects
-- Sophisticated typography inspired by medieval manuscripts, while remaining readable
+- **Top bar:** VEIL wordmark centred, subtitle "DARK FANTASY PROCESSOR", preset browser (prev/next, dropdown, save, load), A/B compare, global bypass, settings menu (UI scale, tooltips, about).
+- **Centre: the Reliquary**, the visual home of the Haunting and the most distinctive part of the interface.
+  - A large circular **memory ring**, drawn like an ancient dial or sundial. It shows the stored memory as a ring of faint, ink-like waveform marks, newest at the top, aging clockwise into the oldest memories; older material fades and discolours like old parchment. Marks are tinted by their pitch content (chroma) using a restrained bronze/silver/burgundy palette.
+  - When a ghost is summoned, a pale **wisp** rises from the exact spot on the ring where its fragment came from and drifts slowly inward toward the centre, fading as the ghost fades. Several ghosts mean several wisps.
+  - The centre holds a softly glowing **heart** that brightens with input level and darkens as Possession grows.
+  - **Bound relics** appear as small sigil glyphs fixed on the ring. Clicking a point on the ring binds a relic there; clicking a relic unbinds it; hovering shows its age and length.
+  - Seal shows the ring as locked (a closing ornamental band). Banish plays a short dissolve animation of the ring.
+  - The Haunting controls sit in an arc below the Reliquary.
+- **Left and right:** the six modules as ornate panels, three per side. Collapsed panels show title, on/off and 2–3 key knobs; clicking expands one panel per side to show all controls.
+- **Bottom:** input/output meters, input gain, global wet/dry, output gain, stereo width/correlation indicator, CPU indicator.
 
-Avoid:
+**Knobs:** custom-drawn dials inspired by astrolabes and celestial instruments. Smooth drag, fine-adjust with shift, double-click to reset to default, hover highlight, value readout while dragging, tooltips, full host automation linkage, and the Possession secondary arc where relevant.
 
-- Generic JUCE default controls
-- Basic rectangular grey panels
-- Excessive neon
-- Cartoon fantasy aesthetics
-- Cluttered layouts
-- Unreadable decorative fonts
-- Stock-looking knobs
+**Rendering and performance:**
 
-### Layout
+- Software rendering with `juce::Graphics` (avoid the deprecated OpenGL path on macOS). Cache static layers (backgrounds, textures, ornaments) in images and only redraw what animates.
+- Animation timer ≤ 30 fps, paused when the editor is not visible. Animation is purely cosmetic and never touches DSP.
+- All assets procedurally drawn or original. No copyrighted images.
 
-TOP:
+---
 
-VEIL logo centered.
+## 6. FACTORY PRESETS
 
-Subheading: "DARK FANTASY PROCESSOR"
+At least 15 presets, each audibly distinct, each setting **every** parameter. Names:
 
-Preset browser, settings, bypass, and A/B comparison controls.
+1. Forgotten Kingdom · 2. Cathedral at Midnight · 3. The Hollow Choir · 4. Abyssal Drone · 5. Cursed Forest · 6. Fallen Angel · 7. Ashes of a King · 8. Moonlit Ruins · 9. The Black Citadel · 10. Ghosts of the Chapel · 11. Witch's Lament · 12. Eternal Winter · 13. The Final Ritual · 14. Ancient Spellbook · 15. Throne of Shadows
 
-CENTER:
+Include one **"Init — Clean Altar"** preset that is near-transparent, as a starting point.
 
-Large interactive Ritual Engine sigil with three archetype labels.
+Each preset also sets the Haunting to suit its character (for example: sparse, distant ancient ghosts for *Forgotten Kingdom*; frequent, harmony-locked choral ghosts for *The Hollow Choir*; heavy Possession for *The Final Ritual*; Haunting off for *Init*). Presets never include bound relics.
 
-The sigil should glow subtly in response to the incoming audio signal.
+- Presets are exposed to the host as AU factory presets and appear in the VEIL browser.
+- User presets save to `~/Library/Audio/Presets/Veil Audio/VEIL/` as XML.
+- Every preset must pass the loudness test: output RMS on a reference sawtooth chord within roughly ±3 dB of input, no clipping.
+- Add a test that measures pairwise spectral/temporal differences between presets and fails if any two are nearly identical.
 
-LEFT AND RIGHT:
+---
 
-Six processing modules arranged as beautifully designed panels around the ritual interface.
+## 7. TESTING
 
-Each module should have collapsible or selectable detailed controls if necessary to avoid crowding.
+### 7.1 Processor tests (run on macOS and Linux CI)
 
-BOTTOM:
+Through the real `AudioProcessor::processBlock` path, not just module classes:
 
-- Input and output meters
-- Global wet/dry
-- Input/output gain
-- Stereo width indication
-- CPU usage indicator if feasible
-- Visual signal activity
+- Sustained sine and sawtooth chord produce meaningful non-zero output at default settings, at 44.1/48/88.2/96/192 kHz, at block sizes 1, 32, 64, 512, 4096 and varying block sizes.
+- Bypass, wet/dry = 0, and all modules off → output matches input (after reported latency).
+- Each module alone: measurably changes the output and stays finite.
+- Mono→mono, stereo→stereo, mono→stereo layouts.
+- Silence in → silence out (except intentional tails and Freeze), no denormals.
+- Extreme settings for every parameter, randomised parameter fuzzing for several thousand blocks: no NaN/Inf, peak stays bounded.
+- Every factory preset: audible, finite, within the loudness window.
+- State round trip: save → new instance → load → identical parameters.
+- Haunting:
+  - Feed a phrase of distinct notes, then sustain a chord; assert ghosts appear and their content correlates with earlier input (not the current input, not silence).
+  - Harmony Lock at 100%: chroma of the ghost layer matches the current input's chroma above a threshold.
+  - Same seed + same input + same transport start → bit-identical output (and a different seed gives different output).
+  - Haunting Off and Possession 0 restore the manual settings exactly; output with Haunting Off matches a build without it.
+  - Seal stops new memories being recorded; Banish clears memory and fades ghosts without clicks; empty memory produces no ghosts.
+  - Loudness bound (+1.5 dB) holds across random settings.
+  - Bound relics survive a state save/load round trip and a sample-rate change.
+  - Memory buffer never reallocates in `processBlock` when Memory length changes.
+- No heap allocations in `processBlock` (allocation-counting test).
+- Repeated create/prepare/release/destroy cycles, with and without an editor open.
 
-### Control Design
+### 7.2 Real Audio Unit host harness (macOS CI, the critical new test)
 
-Create custom rotary controls inspired by antique dials, celestial instruments, and medieval navigation tools.
+Write a small command-line program in C++ or Swift using **AudioToolbox** (not JUCE's own hosting) that behaves like a real host:
 
-Knobs should include:
+1. Finds the installed component `aufx/Vel1/Veil` with `AudioComponentFindNext`.
+2. Instantiates it **twice: in-process, and out-of-process** (`AudioComponentInstantiate` with `kAudioComponentInstantiation_LoadOutOfProcess`), which mimics how sandboxed hosts like GarageBand can load it.
+3. For each instance: sets stereo and mono stream formats, initialises, renders a 440 Hz sine through `AudioUnitRender`, and asserts RMS output > a meaningful threshold.
+4. Tests host bypass (`kAudioUnitProperty_BypassEffect`) passes the input through.
+5. Sets parameters via `AudioUnitSetParameter` and asserts the output changes.
+6. Loads each factory preset via `kAudioUnitProperty_PresentPreset` and asserts audible output.
+7. Saves `kAudioUnitProperty_ClassInfo`, creates a fresh instance, restores it, and checks parameters match.
+8. Queries `kAudioUnitProperty_CocoaUI`, loads the view factory, creates the `NSView` (in-process instance), and asserts it is non-nil with a sensible size. For the out-of-process instance, use the appropriate request-view API if available, and document what is and is not testable.
+9. Runs for both architectures where possible (`arch -arm64` and `arch -x86_64` under Rosetta on Apple Silicon runners).
 
-- Smooth mouse dragging
-- Double-click reset
-- Numerical parameter readout
-- Clear parameter labels
-- Hover highlighting
-- Host automation linkage
+Run this in CI after the install step. If it fails, the build fails.
 
-### Animation
+### 7.3 Validators
 
-Implement tasteful, GPU-efficient or CPU-efficient animations:
+- `auval -v aufx Vel1 Veil` (and `-strict` if available) on arm64 and x86_64.
+- `pluginval` at strictness 10 on the VST3 and AU.
+- Upload all logs as CI artifacts.
 
-- Slowly rotating sigil markings
-- Subtle pulsating glow
-- Audio-reactive light changes
-- Smooth knob movements
-- Glowing Ritual Engine orb
-- Soft transitions when changing archetypes
+### 7.4 Honest limits
 
-Animations should be cosmetic and must not affect DSP timing.
+GarageBand and Logic cannot be driven in CI. Write `docs/MANUAL_TEST.md`: a checklist the user runs on their Mac (insert on instrument track, default sound, custom UI visible, bypass, wet/dry 0, each module alone, every preset, the Haunting (ghosts appear while playing, binding relics, Seal, Banish), automation, save and reopen project, Intel Mac if available). Mark the release "host-verified" only after the user reports back.
 
-Keep visual effects restrained and professional.
+---
 
-The final interface should look good enough for a commercial audio plugin.
+## 8. RELEASE, PACKAGING AND USER INSTRUCTIONS
 
-## 5. FACTORY PRESETS
+- CI uploads `VEIL-macOS-Universal.zip` containing `VEIL.component`, `VEIL.vst3`, `install-mac.sh`, `uninstall-mac.sh`, and a short `INSTALL.txt`.
+- On tagged commits (`v*`), create a GitHub Release with the same zip.
+- **README** must include:
+  - What VEIL is, with screenshots.
+  - **Install:** download, unzip, run `install-mac.sh` (with the exact Terminal command), or the manual equivalent.
+  - **GarageBand:** Settings → Audio/MIDI → make sure *Audio Units* are enabled; restart GarageBand; on a track, open Smart Controls → Plug-ins → Audio Units → Veil Audio → VEIL; if the window shows sliders instead of the VEIL interface, switch the plug-in window's view from *Controls* to *Editor*.
+  - **Logic Pro:** Settings → Plug-in Manager → find VEIL → *Reset & Rescan Selection* if it shows as failed; insert from Audio FX → Audio Units → Veil Audio → VEIL.
+  - Troubleshooting: plugin missing, plugin failed validation, "cannot be opened because the developer cannot be verified", silent output, generic UI.
+  - A guide to every module, every control, and the Haunting, including how to get repeatable bounces with Seed and bound relics.
+  - Preset list with one-line descriptions.
+  - Known limitations and latency notes.
+- `docs/DEVLOG.md` ends with a **Bug Report** section: each bug found in the old version, its root cause, the evidence, and the fix.
 
-Create at least 15 presets with meaningful DSP settings.
+---
 
-1. Forgotten Kingdom — atmospheric, ancient, spacious
-2. Cathedral at Midnight — enormous dark reverb
-3. The Hollow Choir — spectral harmonic ensemble
-4. Abyssal Drone — deep evolving ambient sound
-5. Cursed Forest — unstable organic textures
-6. Fallen Angel — dark ethereal shimmer
-7. Ashes of a King — degraded melancholic ambience
-8. Moonlit Ruins — delicate, mysterious textures
-9. The Black Citadel — massive low-frequency darkness
-10. Ghosts of the Chapel — distant spectral echoes
-11. Witch's Lament — haunting melodic character
-12. Eternal Winter — cold spectral atmosphere
-13. The Final Ritual — heavy evolving transformation
-14. Ancient Spellbook — dusty lo-fi magic
-15. Throne of Shadows — cinematic dark fantasy
+## 9. DEFINITION OF DONE
 
-Make each preset audibly different.
+VEIL is done when **all** of these are true:
 
-Presets should initialize all relevant parameters and load reliably.
+1. A universal (arm64 + x86_64), ad-hoc-signed `VEIL.component` is built by CI and published as an artifact.
+2. All processor tests, the AudioToolbox host harness (in-process and out-of-process), `auval` and `pluginval` pass.
+3. The user has confirmed in GarageBand on their Mac that sound passes, the custom interface appears and the controls are audible.
+4. All six modules, the Haunting with its Reliquary display and bound relics, 15+ presets and the custom interface are implemented and audibly useful.
+5. Inserting VEIL on a bright stock synth with default settings already sounds dark and atmospheric without level jumps.
+6. The README, install scripts, manual test checklist and bug report are complete and accurate.
 
-## 6. DSP QUALITY AND PERFORMANCE
-
-Prioritize sound quality and reliability over implementing every possible feature poorly.
-
-Requirements:
-
-- No clipping caused by careless internal gain staging
-- Denormal protection
-- Smooth bypass transitions
-- Stable feedback networks
-- Correct mono/stereo handling
-- Proper buffer initialization
-- Thread-safe parameter communication
-- Predictable plugin latency reporting
-- No heap allocation inside processBlock
-- Sample-accurate or sufficiently smoothed modulation where appropriate
-- Correct reinitialization when sample rate changes
-- Robust plugin state restoration
-
-Use established DSP design principles and JUCE facilities where appropriate.
-
-For unusually complex modules, prefer a stable and audible first implementation over a broken advanced algorithm.
-
-## 7. IMPLEMENTATION PLAN
-
-Work in stages, but actually implement the project.
-
-Stage 1:
-Create the JUCE/CMake project, AU effect target, parameter tree, basic editor, audio routing, and working bypass.
-
-Stage 2:
-Implement Abyss, Ancient Blood, and Echoes, with audible DSP behavior.
-
-Stage 3:
-Implement Crypt reverb, Wraith spectral processing, and Choir harmonic processing.
-
-Stage 4:
-Implement the Ritual Engine with automated morphing.
-
-Stage 5:
-Replace the basic interface with the complete custom fantasy-themed GUI.
-
-Stage 6:
-Implement presets, automation, metering, state persistence, and polish.
-
-Stage 7:
-Build, run available tests, validate the plugin, and document installation.
-
-Do not stop after writing a plan or project skeleton.
-
-Create actual source files and functional implementations.
-
-## 8. TESTING
-
-Implement appropriate automated tests where feasible, including:
-
-- Parameter range checks
-- State save/load consistency
-- Processing silent input
-- Processing sustained tones and impulses
-- Repeated sample-rate changes
-- Stable feedback at extreme settings
-- No NaN/Inf output
-- Stereo and mono operation
-- Ritual morph boundaries and interpolation
-- Preset loading
-- Repeated plugin initialization/destruction
-
-If the environment supports macOS builds, compile the plugin and fix build errors.
-
-If it does not support a macOS toolchain, do not claim to have built or validated it. Instead, provide complete source code and exact macOS build instructions.
-
-Use Apple's AU validation utility where available and explain how to run the Logic Pro plugin validation process.
-
-## 9. PROJECT DELIVERABLES
-
-Create an organized project with:
-
-- CMakeLists.txt
-- PluginProcessor.h/.cpp
-- PluginEditor.h/.cpp
-- Dedicated DSP module files
-- RitualEngine.h/.cpp
-- Custom visual component files
-- Preset management files
-- Required resources/assets
-- Tests where practical
-- README.md
-
-Provide:
-
-1. All source code
-2. A complete buildable JUCE project
-3. An Audio Unit .component build artifact when the build environment supports it
-4. An optional VST3 artifact
-5. Installation instructions for Logic Pro
-6. A guide to controls and processing modules
-7. A factory preset library
-8. Notes about implemented features, limitations, and known issues
-
-Do not use copyrighted images, artwork, sound recordings, or trademarked game assets. Design all visual assets originally, using vector drawing or procedurally generated graphics where practical.
-
-## 10. FINAL EXPECTATIONS
-
-The goal is to create a plugin that musicians would genuinely enjoy using for dark fantasy sound design, dark ambient, dungeon synth, cinematic composition, experimental music, and atmospheric production.
-
-The project should meet three standards:
-
-**Sound:** Turning an ordinary, bright stock synthesizer into a haunting and evolving sound should be possible with minimal adjustment.
-
-**Visuals:** The interface should resemble an ancient magical artifact, but retain the clarity, precision, and usability of a professional audio plugin.
-
-**Identity:** The Ritual Engine must make VEIL feel different from typical reverb, delay, and multi-effects plugins.
-
-Deliver a fully working first version rather than a visually impressive application with nonfunctional controls.
-
-Start by inspecting the development environment, then build the project and implement the plugin. Make reasonable engineering decisions independently and document them. Do not stop at a conceptual design.
+Start now with Milestone 0: read the repository, then report your audit and diagnosis before writing new features.
