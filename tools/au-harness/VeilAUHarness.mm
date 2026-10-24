@@ -833,12 +833,13 @@ void auAudioUnitSuite(Report& r, AudioComponentDescription description, bool use
     Float64 sampleTime = 0;
     // Hosts either pass their own output buffers or null pointers (the unit supplies them).
     bool hostOutputBuffers = true;
+    AUAudioUnit* const renderUnit = unit;
     auto render = [&](double seconds, double skipSeconds) {
         RenderResult result;
         const auto total = size_t(seconds * 48000.0), skip = size_t(skipSeconds * 48000.0);
         source.reset(total);
         Meter meter;
-        if (unit.latency >= 0 && unit.latency < 1) meter.latency = size_t(std::llround(unit.latency * 48000.0));
+        if (renderUnit.latency >= 0 && renderUnit.latency < 1) meter.latency = size_t(std::llround(renderUnit.latency * 48000.0));
         std::vector<uint8_t> storage(offsetof(AudioBufferList, mBuffers) + sizeof(AudioBuffer) * 2);
         auto* abl = reinterpret_cast<AudioBufferList*>(storage.data());
         size_t doneFrames = 0;
