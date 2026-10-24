@@ -786,6 +786,8 @@ void auAudioUnitSuite(Report& r, AudioComponentDescription description, bool use
     const bool outOkay = unit.outputBusses.count > 0 && [unit.outputBusses[0] setFormat: format48 error: &e];
     r.check(inOkay && outOkay, "set stereo 48 kHz bus formats", toString(e.description));
     unit.maximumFramesToRender = 512;
+    // Hosts fetch and cache the render block, then allocate render resources.
+    AURenderBlock renderBlock = unit.renderBlock;
     e = nil;
     if (!r.check([unit allocateRenderResourcesAndReturnError: &e], "allocateRenderResources", toString(e.description))) return;
     pump(0.3);
@@ -820,7 +822,6 @@ void auAudioUnitSuite(Report& r, AudioComponentDescription description, bool use
         return noErr;
     };
     AudioUnitRenderActionFlags lastFlags = 0;
-    AURenderBlock renderBlock = unit.renderBlock;
     Float64 sampleTime = 0;
     // Hosts either pass their own output buffers or null pointers (the unit supplies them).
     bool hostOutputBuffers = true;

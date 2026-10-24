@@ -58,7 +58,7 @@ jobs:
           for f in build/ci-logs/auval-*.txt; do
             if [[ -f "$f" ]]; then tail -25 "$f" > "$f.tail"; fi
           done
-          bash scripts/ci-annotate.sh --condense build/ci-logs/harness-x86_64-*.txt build/ci-logs/crashes.txt build/ci-logs/auval-*.txt.tail
+          bash scripts/ci-annotate.sh --condense build/ci-logs/harness-x86_64-*.txt build/ci-logs/control-*.txt build/ci-logs/crashes.txt build/ci-logs/auval-*.txt.tail
       - name: Upload installable package (only when every check passed)
         uses: actions/upload-artifact@v4
         with:

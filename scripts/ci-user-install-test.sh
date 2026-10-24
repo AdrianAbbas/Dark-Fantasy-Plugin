@@ -75,6 +75,12 @@ if /usr/bin/arch -x86_64 /usr/bin/true 2>/dev/null; then
 else
     echo "::error::Rosetta unavailable: the x86_64 slice was not validated"; status=1
 fi
+# Control (diagnostic, not a gate): Apple's own AULowpass through the AUAudioUnit route,
+# to tell a harness problem on that route from a VEIL problem.
+set +e
+limit 300 "$harness" --only auaudiounit --no-window --component aufx:lpas:appl > "$logs/control-apple-lowpass-auaudiounit.txt" 2>&1
+echo "control (Apple AULowpass, AUAudioUnit route): exit $?"
+set -e
 grep -h -E "^(FAIL|SUMMARY)" "$logs"/harness-*.txt || true
 python3 "$(dirname "${BASH_SOURCE[0]}")/ci-crash-summary.py" 60 VeilAUHarness AUHostingService auval VEIL > "$logs/crashes.txt" 2>&1 || true
 cat "$logs/crashes.txt"
