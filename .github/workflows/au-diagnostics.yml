@@ -1,4 +1,4 @@
-name: Recover original AU validation logs
+name: Retrieve verified AU run evidence
 on:
   push:
     branches: [ci/au-diagnostics]
@@ -11,23 +11,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Retrieve original macOS job logs
+      - name: Retrieve validation logs and artifact metadata
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p diagnostics
-          set +e
-          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/jobs/120759313834/logs > diagnostics/macos-original-job.log 2> diagnostics/job-logs-error.txt
-          echo "job_logs_exit=$?" > diagnostics/retrieval-status.txt
-          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40056101232 > diagnostics/original-run.json 2> diagnostics/run-info-error.txt
-          echo "run_info_exit=$?" >> diagnostics/retrieval-status.txt
-          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40056101232/logs > diagnostics/original-run-logs.zip 2> diagnostics/run-logs-error.txt
-          echo "run_logs_exit=$?" >> diagnostics/retrieval-status.txt
-      - name: Preserve logs on diagnostic branch for retrieval
+          mkdir -p diagnostics/verified-au
+          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40059499771 > diagnostics/verified-au/run.json
+          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40059499771/jobs > diagnostics/verified-au/jobs.json
+          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40059499771/logs > diagnostics/verified-au/logs.zip
+          gh api repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/runs/40059499771/artifacts > diagnostics/verified-au/artifacts.json
+          artifact_id=$(python3 - <<'PY'
+          import json
+          data=json.load(open('diagnostics/verified-au/artifacts.json'))
+          print(next(a['id'] for a in data['artifacts'] if a['name']=='VEIL-macOS-arm64-unsigned'))
+          PY
+          )
+          gh api "repos/AdrianAbbas/Dark-Fantasy-Plugin/actions/artifacts/$artifact_id/zip" > /tmp/veil-native-artifact.zip
+          python3 - <<'PY'
+          import zipfile
+          from pathlib import Path
+          out=Path('diagnostics/verified-au')
+          with zipfile.ZipFile('/tmp/veil-native-artifact.zip') as z:
+              assert z.testzip() is None
+              candidates=[n for n in z.namelist() if n.endswith('VEIL-macOS-arm64-AU.zip')]
+              assert len(candidates)==1,z.namelist()
+              (out/'VEIL-macOS-arm64-AU.zip').write_bytes(z.read(candidates[0]))
+          with zipfile.ZipFile(out/'logs.zip') as z:
+              for n in z.namelist():
+                  if n.endswith('_macos.txt') and '/' not in n:
+                      (out/'macos-complete.log').write_bytes(z.read(n))
+          PY
+      - name: Preserve validation evidence for retrieval
         if: always()
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add diagnostics
-          git commit -m 'Record original macOS AU validation logs'
+          git commit -m 'Preserve Apple Silicon AU validation result and packaged component'
           git push origin HEAD:ci/au-diagnostics
