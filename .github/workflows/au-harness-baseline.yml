@@ -94,10 +94,10 @@ jobs:
       # Annotations are readable through the REST API; at most 10 notices per step.
       - name: Publish experiment logs as annotations (A, B)
         if: always()
-        run: bash scripts/ci-annotate.sh logs/environment.txt logs/old-bundles.txt logs/A-register.txt logs/A-final-arm64.txt logs/A-final-x86_64.txt logs/B-quarantine.txt logs/B-quarantined-arm64.txt
+        run: bash scripts/ci-annotate.sh --condense logs/environment.txt logs/old-bundles.txt logs/A-register.txt logs/A-final-arm64.txt logs/A-final-x86_64.txt logs/B-quarantine.txt logs/B-quarantined-arm64.txt
       - name: Publish experiment logs as annotations (C, D)
         if: always()
-        run: bash scripts/ci-annotate.sh logs/C-register.txt logs/C-linker-signed-arm64.txt logs/D-register.txt logs/D-sandboxsafe-arm64.txt
+        run: bash scripts/ci-annotate.sh --condense logs/C-register.txt logs/C-linker-signed-arm64.txt logs/D-register.txt logs/D-sandboxsafe-arm64.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:

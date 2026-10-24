@@ -1,3 +1,5 @@
+> **Historical.** Validation notes from the first version (before Milestone 0). Current test status and the GarageBand root cause are in [DEVLOG.md](DEVLOG.md). `scripts/validate-au-macos.sh` mentioned below was replaced by `install-mac.sh` and `ci-user-install-test.sh`.
+
 # VEIL first-version validation
 
 ## Scope

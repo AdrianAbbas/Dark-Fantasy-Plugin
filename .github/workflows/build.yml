@@ -48,14 +48,17 @@ jobs:
         run: bash scripts/build-au-harness.sh build/VeilAUHarness
       - name: Install a quarantined download with install-mac.sh, then auval and harness (arm64 + x86_64)
         run: bash scripts/ci-user-install-test.sh dist/VEIL-macOS-Universal.zip build/VeilAUHarness build/ci-logs
-      - name: Publish logs as annotations
+      # Annotations are readable through the REST API; GitHub keeps at most 10 per step.
+      - name: Publish install and arm64 harness logs as annotations
+        if: always()
+        run: bash scripts/ci-annotate.sh --condense build/ci-logs/quarantine.txt build/ci-logs/install-mac.txt build/ci-logs/harness-arm64.txt
+      - name: Publish x86_64 harness and auval logs as annotations
         if: always()
         run: |
-          bash scripts/ci-annotate.sh build/ci-logs/quarantine.txt build/ci-logs/install-mac.txt \
-            build/ci-logs/harness-arm64.txt build/ci-logs/harness-x86_64.txt
           for f in build/ci-logs/auval-*.txt; do
-            [[ -f "$f" ]] && { tail -40 "$f" > "$f.tail"; bash scripts/ci-annotate.sh "$f.tail"; }
+            if [[ -f "$f" ]]; then tail -25 "$f" > "$f.tail"; fi
           done
+          bash scripts/ci-annotate.sh --condense build/ci-logs/harness-x86_64.txt build/ci-logs/auval-*.txt.tail
       - name: Upload installable package (only when every check passed)
         uses: actions/upload-artifact@v4
         with:

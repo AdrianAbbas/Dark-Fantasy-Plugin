@@ -1,113 +1,115 @@
 # VEIL
 
-A native JUCE/C++20 stereo or mono **audio effect** for dark ambient, dungeon synth and cinematic sound design. Six working DSP modules surround an automatable triangular Ritual Engine. All artwork is procedural vector drawing; there are no game assets or external sound files.
+VEIL is an Audio Unit effect for Logic Pro and GarageBand on macOS (Apple Silicon and Intel, macOS 10.15 or later). It turns synths, pads, pianos and guitars into dark, cinematic textures: cathedral reverbs, haunted delays, phantom choirs, worn saturation. VST3 is built too; a Standalone app exists for development only.
 
-## Build
+All artwork is drawn procedurally. There are no third-party images, fonts, samples or game assets.
 
-CMake pins JUCE **8.0.6** to commit `51a8a6d7aeae7326956d747737ccf1575e61e209`. Supply `-DJUCE_PATH=/path/to/JUCE` for an existing copy of that version; otherwise CMake fetches it. An internet connection is needed for the initial dependency fetch. CMake 3.22+, a C++20 compiler and Git are required.
+> **Status: Milestone 1.** This build is about loading and working correctly in hosts: universal binary, sandbox-safe, installer that clears the download quarantine, and automated host tests. The six sound modules are the first-generation versions. The signature feature, *The Haunting*, and the final interface arrive in later milestones (see [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md) and [docs/DEVLOG.md](docs/DEVLOG.md)).
 
-### macOS / Logic Pro
+## Install
 
-Install Xcode and its command-line tools, CMake and Ninja. On Apple Silicon, from this checkout:
+1. Download **VEIL-macOS-Universal** from the latest green [Native build](https://github.com/AdrianAbbas/Dark-Fantasy-Plugin/actions/workflows/build.yml) run, or `VEIL-macOS-Universal.zip` from a [release](https://github.com/AdrianAbbas/Dark-Fantasy-Plugin/releases).
+2. Double-click the download to unzip it. If you got the Actions artifact, it contains `VEIL-macOS-Universal.zip`; double-click that too. You now have a folder **VEIL-macOS-Universal**.
+3. Quit GarageBand and Logic.
+4. Open **Terminal** (Applications → Utilities). Type `bash ` (with a space), drag `install-mac.sh` from the folder into the window, press Return. For example:
+   ```sh
+   bash ~/Downloads/VEIL-macOS-Universal/install-mac.sh
+   ```
+5. Wait for **"VEIL is installed and validated."**
+
+**Why a script?** This build is signed ad hoc, not with a paid Apple Developer ID. When a browser downloads it, macOS marks every file with `com.apple.quarantine`. Gatekeeper then refuses to load the plug-in code. GarageBand shows a silent slot with plain sliders, and `auval` reports `Cannot open component: -1`. That was the bug in the first release. The script fixes it, in order:
+- copies the plug-ins to `~/Library/Audio/Plug-Ins/Components` and `…/VST3`;
+- removes the quarantine flag;
+- re-signs ad hoc and verifies;
+- restarts `AudioComponentRegistrar`;
+- runs Apple's `auval`.
+
+### Manual install (equivalent)
 
 ```sh
-cmake -S . -B build-mac -G Ninja -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
-cmake --build build-mac --parallel 4
-ctest --test-dir build-mac --output-on-failure
+cp -R VEIL.component ~/Library/Audio/Plug-Ins/Components/
+xattr -dr com.apple.quarantine ~/Library/Audio/Plug-Ins/Components/VEIL.component
+codesign --force --deep --sign - ~/Library/Audio/Plug-Ins/Components/VEIL.component
+killall -9 AudioComponentRegistrar
+auval -v aufx Vel1 Veil        # should end with "AU VALIDATION SUCCEEDED"
 ```
 
-For an Intel Mac use `x86_64`; for a universal binary use `"arm64;x86_64"`. Alternatively use `-G Xcode`, then `cmake --build build-mac --config Release --parallel 4` and `ctest --test-dir build-mac -C Release --output-on-failure`.
+Uninstall with `bash uninstall-mac.sh` (`--purge` also deletes saved presets).
 
-Outputs are under `build-mac/VEIL_artefacts/Release/`:
+## GarageBand
 
-- `AU/VEIL.component` — AUv2 effect for Logic Pro
-- `VST3/VEIL.vst3`
-- `Standalone/VEIL.app`
+1. **GarageBand → Settings → Audio/MIDI**: make sure **Audio Units** is enabled. Restart GarageBand.
+2. Select a software-instrument track, open **Smart Controls** (press B), click **Plug-ins**, then click an empty slot. Choose **Audio Units → Veil Audio → VEIL**.
+3. If the plug-in window shows sliders instead of the VEIL interface, switch the view menu at the top of the plug-in window from **Controls** to **Editor**.
 
-Install, register and validate the Apple Silicon AU:
+## Logic Pro
+
+1. **Logic Pro → Settings → Plug-in Manager**. Find **Veil Audio → VEIL**. If it is marked as failed, select it and click **Reset & Rescan Selection**.
+2. Insert it from an **Audio FX** slot: **Audio Units → Veil Audio → VEIL**. VEIL is an effect: put it after an instrument, or on an audio track.
+
+## Troubleshooting
+
+| Symptom | What to do |
+|---|---|
+| VEIL is missing from the plug-in list | Run `install-mac.sh` again and check that it prints `macOS lists aufx Vel1 Veil`. Remove any old copy in `/Library/Audio/Plug-Ins/Components` (the script warns about it). Restart the host. |
+| "VEIL cannot be opened because the developer cannot be verified" | The quarantine flag is still there. Run `install-mac.sh`; do not click *Move to Trash*. |
+| Plug-in failed validation in Logic | Run `auval -v aufx Vel1 Veil` in Terminal. If it ends with `AU VALIDATION SUCCEEDED`, use **Reset & Rescan Selection** in the Plug-in Manager. |
+| Silent output, plain sliders, controls do nothing | macOS refused to load the code (quarantine). Run `install-mac.sh`, then restart the host. |
+| Plain sliders but sound works | Switch the plug-in window's view from **Controls** to **Editor**. |
+| Something else | Run `bash scripts/diagnose-mac.sh` (read-only) with the host open and VEIL inserted, and attach `~/Desktop/VEIL-diagnostics.txt` to an issue. |
+
+If GarageBand still cannot load VEIL in-process after a clean install, `bash install-mac.sh --out-of-process` removes the sandbox-safe flag from the installed copy. GarageBand then hosts VEIL in a separate process instead.
+
+## Distributing to other people
+
+Ad-hoc signing only works on the Mac that runs the install script. To hand VEIL to others without the script, it needs a paid Apple Developer ID, signing with the hardened runtime, notarisation and stapling. CI has an optional path for this (`scripts/ci-developer-id.sh`). It runs when these repository secrets are set and is skipped otherwise:
+- `MACOS_CERTIFICATE`, `MACOS_CERTIFICATE_PASSWORD`, `MACOS_SIGNING_IDENTITY`;
+- `NOTARY_APPLE_ID`, `NOTARY_TEAM_ID`, `NOTARY_PASSWORD`.
+
+That path has not been exercised yet.
+
+## Sound modules (first generation)
+
+Signal order today: Abyss → Ancient Blood → Echoes → Crypt → Wraith → Choir → global Wet/Dry → output. Milestone 2 changes it to the order in the brief (Abyss → Blood → Choir → Wraith → Echoes → Crypt).
+
+| Module | What it does now |
+|---|---|
+| **The Abyss** | Resonant low-pass (12/24 dB), high-pass, Darkness, slow cutoff Movement. |
+| **The Crypt** | Eight-line feedback-delay-network reverb: Space, Decay, Pre-Delay, Damping, Low Cut, Shimmer, Width, Mix, four chamber characters. |
+| **The Wraith** | Granular blur, detune and drift with a delayed fifth "ghost"; Freeze holds a short processed texture. (An STFT spectral version replaces this in Milestone 2.) |
+| **Ancient Blood** | Saturation with Texture, Age (bandwidth and bit softening), Dust, Instability (wow), Mix. |
+| **The Echoes** | Delay with free or synced time, Feedback, Damping, Diffusion, Reverse, Stereo Spread, Mix. |
+| **The Choir** | Up to four pitch-shifted voices (octave/fifth intervals) with detune, movement and vowel colour. |
+
+Every control is automatable and saved with the project. Host bypass and VEIL's own **Bypass** pass the dry signal. **Wet/Dry 0 %**, or all modules off, passes the input unchanged. Reported latency is 0 samples; the wet layers carry their own intentional delays.
+
+## Building
+
+Requirements: CMake 3.22+, a C++20 compiler, Git. CMake fetches JUCE 8.0.16 (pinned commit) unless you pass `-DJUCE_PATH=/path/to/JUCE`.
 
 ```sh
-bash scripts/validate-au-macos.sh build-mac/VEIL_artefacts/Release/AU/VEIL.component build-mac/au-validation
-```
-
-The script checks the arm64 architecture and exact AU identifiers (`aufx` / `Vel1` / `Veil`), ad-hoc-signs the complete bundle, installs it with `ditto`, refreshes the current user's AudioComponentRegistrar and waits for discovery before running Apple's `auval`. Registration failures and actual validation failures remain errors; logs are saved in the selected validation directory. The script is specifically for arm64 validation. An Intel build needs the equivalent x86_64 `auval` invocation.
-
-GitHub Actions uploads **VEIL-macOS-arm64-unsigned** even when validation fails. It contains `VEIL-macOS-arm64-AU.zip`; extract that inner ZIP to preserve the component's executable permissions and bundle structure. Install `VEIL.component` in `~/Library/Audio/Plug-Ins/Components/`. The accompanying **VEIL-macOS-AU-diagnostics** artifact contains the discovery, signature and complete `auval` output. A downloadable artifact does not by itself establish that validation passed; check the macOS job result.
-
-Quit Logic before installing. Launch Logic, open **Logic Pro > Settings > Plug-in Manager**, find **Veil Audio / VEIL**, and use **Reset & Rescan Selection** if needed. Insert VEIL in an **Audio FX** slot after the instrument on a software instrument channel strip, or on an audio track. It is not an instrument and requires incoming audio. Verify automation, mono/stereo instances, bypass and session reopening in Logic. Developer-local builds are not notarized distribution releases; commercial delivery needs your own Apple signing identity, hardened-runtime packaging where applicable, notarization and installer testing.
-
-The Native build workflow builds all three macOS formats for Apple Silicon and runs Apple's full `auval` validation. Check the macOS job for the commit you download; artifacts are retained even after a failure. The bundles use local ad-hoc signing, not Developer ID signing/notarization. Logic Pro hosting and session-reopening checks still need your Mac.
-
-### Linux development
-
-On a normal Debian/Ubuntu development machine install CMake, Ninja, a C++20 compiler, pkg-config, ALSA, FreeType, Fontconfig, X11 (including Xcomposite, Xcursor, Xext, Xinerama, Xrandr, Xrender) and OpenGL development packages. WebKit, CURL and browser support are disabled.
-
-This cloud machine uses a tested rootless Debian 13 amd64 bootstrap:
-
-```sh
-bash scripts/bootstrap-linux.sh
-source /workspace/toolchain/activate.sh
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DJUCE_PATH=/workspace/deps/JUCE
-cmake --build build --parallel 3
+# macOS (universal arm64 + x86_64, macOS 10.15+ by default)
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel 4
 ctest --test-dir build --output-on-failure
+bash scripts/package-mac.sh build/VEIL_artefacts/Release dist   # signs and zips
+bash scripts/build-au-harness.sh build/VeilAUHarness             # AudioToolbox host test
 ```
 
-Use one build process per build directory; `--parallel 3` supplies compiler parallelism.
+On Linux the same commands build the VST3 and Standalone and run the processor tests (install the JUCE Linux dependencies listed in `.github/workflows/build.yml`).
 
-If `/workspace/deps/JUCE` is absent, omit `-DJUCE_PATH` to fetch the pinned dependency. The bootstrap uses signed Debian package metadata and extracts verified packages under `/workspace/toolchain`, without system installation. Set `VEIL_TOOLCHAIN` before running it to select another writable directory. It is specific to Debian 13 amd64. Linux outputs include `build/VEIL_artefacts/Release/VST3/VEIL.vst3` and `build/VEIL_artefacts/Release/Standalone/VEIL`. The cloud build uses GCC 14/glibc 2.41 and needs a compatible Linux host; it is not a broadly portable older-distribution package.
+### Tests
 
-Run the standalone in a desktop session, select an audio device in **Options**, and enable an input. Hardware devices are not available in every cloud environment. In a DAW, insert the VST3 after an instrument or on an audio track. The standalone does not generate synth audio itself.
+- `Tests/VeilTests.cpp`: processor tests through `processBlock`. They cover:
+  - parameters, presets and state;
+  - mono/stereo/mono→stereo routing, bypass and dry-path transparency;
+  - several sample rates, silence, extreme settings;
+  - no heap allocation in `processBlock`;
+  - module behaviour;
+  - editor lifecycle.
+- `tools/au-harness/VeilAUHarness.mm`: a small AudioToolbox host, not JUCE. It loads `aufx/Vel1/Veil` out-of-process (AUv2 and AUAudioUnit APIs, as GarageBand and Logic do on Apple Silicon) and in-process. It renders audio and checks host bypass, parameters, every factory preset, state restore and the editor view. CI runs it `--strict` on arm64 and x86_64, after installing a deliberately quarantined download with `install-mac.sh`.
+- [docs/MANUAL_TEST.md](docs/MANUAL_TEST.md): the checklist for GarageBand and Logic, which CI cannot drive.
 
-## First sound
+## Licences
 
-Start with **Forgotten Kingdom**, feed a sustained synth or piano, and set global Wet / Dry around 60–70%. Drag the orb towards **SHADOW** for dark warmth, **SPIRIT** for harmonics and spectral space, or **RUIN** for distressed texture. Turn **Ritual Motion** on for slow evolution. Select any of the six module panels to expose its full controls. Disable individual modules to isolate their character. Disable Ritual to hear unmodified manual parameter values.
-
-Custom antique rotary dials support dragging, editable numerical values and double-click reset. Every sound control is an automatable JUCE parameter. The `◈` marker identifies controls influenced by Ritual; the stored dial position remains the manual base value. The moving orb displays the effective, smoothed position, including motion. Module enable, global bypass, gains and zero module wet mixes remain under manual control.
-
-Use **Save** / **Load** to store complete `.veilpreset` parameter presets. A/B recall compares two captured parameter snapshots; store each slot before recalling it. Comparison slots are temporary and are not stored in host/preset files. Host sessions store all parameters through versioned JUCE state data. Factory programs initialize every parameter; the 15 factory names and individual settings live in `Source/PresetManager.cpp`.
-
-## Processing and controls
-
-The signal order is **Abyss → Ancient Blood → Echoes → Crypt → Wraith → Choir → global blend/output**. Each module's enable control fades its contribution; the effect continues updating its internal history. Global bypass fades to the untouched input, leaving histories running for predictable re-entry. The global dry signal receives input/output gain; full bypass skips those gains. Host tempo defaults to 120 BPM when unavailable.
-
-| Module | Controls and behavior |
-| --- | --- |
-| **The Abyss** | Bounded resonant low-pass (12/24 dB, crossfaded slope), high-pass, Darkness tilt/cutoff coloration, sinusoidal Movement and rate. Sync sets the movement cycle to four host beats. |
-| **The Crypt** | Eight-line Householder feedback delay network with Space, T60 Decay, smoothed Pre-Delay, Damping, input Low Cut, actual feed-forward octave Shimmer, Width and Mix. Four acoustic characters change delay geometry and damping, independently of presets. |
-| **The Wraith** | Two-head windowed granular resampling with filtered Spectral Blur, pitch Detune, slow Drift, a delayed fifth-shifted Ghost layer, and Mix. Freeze retains a **1.25-second processed texture** while overlapping playback heads continue traversing it. Feed audio before freezing. |
-| **Ancient Blood** | Drive and nonlinear Texture, 2× interpolated saturation/reconstruction filtering, Age bit/hold degradation and darkening, gated Dust, wow/level Instability, Mix. Dust is intentionally absent on digital silence. |
-| **The Echoes** | Free 20–2000 ms time or eighth/quarter/dotted-quarter/half-note sync, bounded Feedback, Damping, allpass Diffusion, buffered overlapping Reverse grains, Stereo Spread and Mix. Time changes bend pitch smoothly. Reverse Time is grain duration; history spans up to twice that duration. |
-| **The Choir** | One to four additional, genuinely pitch-shifted voices: octave below, fifth below, fifth above, octave above or unison. Detune and Movement animate them; Formant moves broad vocal-band resonators. Blend sets their contribution. This is a creative phantom ensemble, not realistic vocal synthesis. |
-
-### Ritual Engine
-
-The triangle's vertices are Shadow `(0,1)`, Spirit `(0.5,0)`, Ruin `(1,1)` in normalized XY coordinates. Points outside the triangle are projected back into it; the normalized barycentric weights sum to one. The engine modifies 23 continuous controls across the modules with bounded offsets/scales, then clamps to their physical ranges. Manual settings remain stored, and a manually zeroed wet mix stays zero. Input/output gain, bypass, enables, freeze and timing choices are not changed by the archetypes.
-
-Motion supports Circle, Pendulum and smoothly interpolated deterministic Wander. Depth sets excursion; Rate is in Hz, or sync uses a 16-beat cycle at host BPM. Motion follows tempo but is not transport-position-locked. Manual XY and motion are smoothed; the animation is message-thread-only and never drives DSP.
-
-## Engineering limits
-
-- The instantaneous dry path has **zero reported host latency**. Granular Wraith/Choir/shimmer and reverse delay introduce intentional audible wet-path delay (roughly tens to hundreds of milliseconds, or up to twice the selected reverse delay duration); these are sound-design layers, not phase-transparent pitch correction. Global dry/wet mixing can produce combing as part of the effect.
-- Granular windows and interpolation trade CPU cost against pitch sidebands/transient smearing. The Wraith is an equivalent granular texture effect, not an FFT spectral-bin freeze. Frozen capture audio is not serialized; parameter state is. A frozen empty buffer produces silence until unfrozen and fed audio.
-- Blood's 2× interpolation/reconstruction reduces aliasing but is not a mastering-grade high-order oversampling filter. Strong settings intentionally degrade fidelity.
-- All audio history storage is allocated during prepare; processing is allocation-free in regression coverage, with no explicit locks. Histories are reset on re-prepare/sample-rate change. Supported test rates are 44.1, 48, 88.2 and 96 kHz.
-- Feedback gains are bounded, denormals suppressed, and nonfinite inputs sanitized. A transparent-below-0.98 soft safety knee approaches a ±2 output ceiling for processed audio. This is not a brickwall true-peak limiter; reduce output gain for intersample/headroom requirements. Full bypass preserves finite input levels.
-- CPU readout estimates this instance's processing cost versus block duration; it is not the host's total CPU load. Meters show peak amplitude. There is no audio hardware monitoring claim for the cloud session.
-- A first version still needs musician listening tests, target-Mac host validation and performance profiling before production distribution.
-
-## Validation and source layout
-
-`VeilTests` exercises parameters, all factory presets, host state and user preset round trips, mono/stereo routing, bypass, multiple rates, silent/tone/impulse inputs, extreme feedback settings, nonfinite safety, allocation behavior, module sound changes, real harmonizer pitch, frozen-tail retention and ritual boundaries/motion. Test results and the cloud build details are recorded in [docs/VALIDATION.md](docs/VALIDATION.md). Optional UI rendering uses `VeilTests --render-ui path.png` under a desktop or Xvfb; it does not replace listening or DAW testing.
-
-- `Source/PluginProcessor.*` — JUCE host integration, automation, routing, state and meters
-- `Source/Parameters.h` — stable parameter IDs, ranges and defaults
-- `Source/DSP/BasicModules.*`, `SpatialModules.*` — six DSP engines
-- `Source/RitualEngine.*` — barycentric morph and motion
-- `Source/PresetManager.*` — complete factory bank
-- `Source/PluginEditor.*`, `Source/UI/` — original native vector interface
-- `Tests/` — offline regression executable
-- `scripts/bootstrap-linux.sh` — repeatable rootless cloud setup
-- `docs/PROJECT_BRIEF.md` — supplied design requirements
-
-JUCE is a third-party dependency with its own AGPL/commercial licensing terms. Choose an appropriate JUCE license before distributing VEIL; this repository does not grant a commercial JUCE license. No third-party image, font or audio assets are bundled.
+JUCE is used under its own licence terms (AGPLv3 or a commercial JUCE licence); choose the appropriate one before distributing VEIL.

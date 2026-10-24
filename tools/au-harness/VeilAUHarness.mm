@@ -369,6 +369,19 @@ OSStatus setParameter(AudioUnit unit, AudioUnitParameterID id, float value) {
     return AudioUnitSetParameter(unit, id, kAudioUnitScope_Global, 0, value, 0);
 }
 
+// JUCE publishes continuous AU parameters normalised to 0...1, so a value in real
+// units ("0 dB") must be converted by the plug-in, exactly as a host does for typed text.
+bool valueFromString(AudioUnit unit, AudioUnitParameterID id, NSString* text, float& value) {
+    AudioUnitParameterValueFromString request {};
+    request.inParamID = id;
+    request.inString = (__bridge CFStringRef) text;
+    UInt32 size = sizeof(request);
+    if (AudioUnitGetProperty(unit, kAudioUnitProperty_ParameterValueFromString, kAudioUnitScope_Global, 0, &request, &size) != noErr)
+        return false;
+    value = request.outValue;
+    return true;
+}
+
 bool isDiscrete(const AudioUnitParameterInfo& info) {
     return info.unit == kAudioUnitParameterUnit_Indexed || info.unit == kAudioUnitParameterUnit_Boolean;
 }
@@ -575,13 +588,21 @@ void v2Suite(Report& r, AudioComponent component, bool outOfProcess, bool useWin
         const auto* mix = findParameter(params, { "Wet / Dry", "Mix", "Global Mix" });
         const auto* output = findParameter(params, { "Output", "Output Gain" });
         if (mix != nullptr && output != nullptr) {
-            const float mixWas = getParameter(unit, mix->id), outWas = getParameter(unit, output->id);
-            setParameter(unit, mix->id, mix->info.minValue);
-            setParameter(unit, output->id, 0.0f);
-            auto dry = host.render(1.5, 0.5);
-            r.check(dry.diffDb() < -40.0, "Wet/Dry 0 + Output 0 dB passes input through (residual < -40 dB)", dry.describe());
-            setParameter(unit, mix->id, mixWas);
-            setParameter(unit, output->id, outWas);
+            r.info("parameter value range as published", strf("Output: min %g max %g default %g (JUCE: normalised)",
+                   double(output->info.minValue), double(output->info.maxValue), double(output->info.defaultValue)));
+            float unity = 0;
+            if (!valueFromString(unit, output->id, @"0", unity)) {
+                r.skip("Wet/Dry 0 + Output 0 dB passes input through", "kAudioUnitProperty_ParameterValueFromString unavailable");
+            } else {
+                const float mixWas = getParameter(unit, mix->id), outWas = getParameter(unit, output->id);
+                setParameter(unit, mix->id, mix->info.minValue);
+                setParameter(unit, output->id, unity);
+                auto dry = host.render(1.5, 0.5);
+                r.check(dry.diffDb() < -40.0, "Wet/Dry 0 + Output 0 dB passes input through (residual < -40 dB)",
+                        strf("Output '0' = %g; %s", double(unity), dry.describe().c_str()));
+                setParameter(unit, mix->id, mixWas);
+                setParameter(unit, output->id, outWas);
+            }
         }
 
         // 5. Factory presets via kAudioUnitProperty_PresentPreset.
@@ -617,6 +638,10 @@ void v2Suite(Report& r, AudioComponent component, bool outOfProcess, bool useWin
             const float original = getParameter(unit, p.id);
             if (setParameter(unit, p.id, v) == noErr) changed.push_back({ p.id, original });
         }
+        // Let the changes reach an out-of-process instance before saving, as they
+        // would long before any host saves a project.
+        host.render(0.3, 0.0);
+        pump(0.3);
         CFPropertyListRef state = nullptr;
         size = sizeof(state);
         s = AudioUnitGetProperty(unit, kAudioUnitProperty_ClassInfo, kAudioUnitScope_Global, 0, &state, &size);

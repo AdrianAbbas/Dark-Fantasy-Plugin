@@ -151,6 +151,47 @@ The chain, from the report's system log:
 
 ---
 
+## Milestone 1: transparent, loadable, visible (2026-10-24)
+
+### Changes
+
+- **Installation (fixes B4/B7).** `scripts/install-mac.sh` does the following, in order:
+  - copies the AU and VST3 to the user folders and warns about system-wide duplicates;
+  - removes `com.apple.quarantine` and checks that none remains;
+  - re-signs ad hoc (keeping a Developer ID signature if there is one) and verifies;
+  - runs `killall -9 AudioComponentRegistrar` and waits for `aufx Vel1 Veil` to be listed;
+  - runs `auval -v` (and, under Rosetta, x86_64), prints PASS/FAIL, then the GarageBand and Logic steps.
+
+  `--out-of-process` strips `sandboxSafe` from the installed copy as a fallback. `uninstall-mac.sh` and `packaging/INSTALL.txt` are added. `validate-au-macos.sh` is removed (superseded).
+- **Build.**
+  - JUCE 8.0.6 → **8.0.16** (`ea774447`, latest 8.x): picks up the AU-client editor-ownership and channel-info fixes (E6).
+  - `AU_SANDBOX_SAFE TRUE`.
+  - macOS defaults to universal `arm64;x86_64` with deployment target **10.15** (arm64 slices are 11.0 by definition).
+- **Processor.**
+  - Layouts: mono→mono, stereo→stereo and **mono→stereo**. Input and output channel counts are now handled separately; the old code derived the right-output pointer from the *input* count, which would have left the right output silent with mono→stereo.
+  - Output gain defaults to **0 dB**, so Wet/Dry 0 and all-modules-off are exactly transparent at default gains (now tested).
+- **Default level.** A new test measured the default chain on a bright saw chord at **−5.1 dB** (about −8 dB with the old −3 dB output default). The wet layers were linearly crossfaded with the dry signal, which loses energy for uncorrelated layers. Crypt, Echoes, Wraith and Choir now use an equal-power blend (exact at mix 0 and 1): **−2.5 dB**.
+
+  Per-module probe (each alone): Crypt −1.1, Abyss −0.6 (its resonance compensation also lowers the passband), Choir −0.4, Echoes −0.3; the Ritual Engine adds −0.4. These belong to the Milestone 2 rewrites, which must reach the brief's ±2 dB. The Milestone 1 regression guard is ±3 dB.
+- **CI (`build.yml`).** In order:
+  1. universal build;
+  2. processor tests on arm64 and under Rosetta (x86_64 slice);
+  3. `ci-check-bundles.sh` gate: both slices in AU/VST3/Standalone, AU identity, `sandboxSafe` true;
+  4. optional Developer ID path;
+  5. `package-mac.sh`: `codesign --force --deep --sign -` every bundle, verify strict, zip `VEIL-macOS-Universal.zip` with ditto;
+  6. **`ci-user-install-test.sh`**: unzip, quarantine every file like a Chrome download, record what macOS does with the quarantined copy, install with `install-mac.sh --ci`, then `auval` and the harness `--strict` on arm64 and x86_64 (every step time-limited).
+
+  The installable artifact is uploaded only when all of that passes. Logs go out as annotations, readable through the REST API, because this environment cannot download artifacts. A `release` job publishes the same zip for `v*` tags.
+- **Harness.** If the v2 API does not offer `kAudioUnitProperty_RequestViewController` for an out-of-process instance, that is now reported rather than failed (Apple does not promise it). The `AUAudioUnit` `requestViewController` path, the one modern hosts use, stays required.
+
+### Verified so far
+
+- Linux: JUCE 8.0.16 build with VST3 and Standalone; **485 passed, 0 failed**.
+- macOS CI: pending (run for `4d78227`).
+- GarageBand on the user's Mac: pending (Milestone 1 gate).
+
+---
+
 ## Bug report: old version (05cc9e5)
 
 | ID | Bug | Status | Evidence | Fix |
